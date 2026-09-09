@@ -579,6 +579,20 @@ export default function App() {
         </button>
       </div>
 
+      {/* The instruction sits above the ball; the question field and examples below it */}
+      <p className="hint" aria-live="polite" key={hint}>
+        {hint}
+      </p>
+
+      <div className={`stage phase-${phase}`} ref={sceneRef} style={{ "--glow": glow } as React.CSSProperties}>
+        <div className="ball-glow" />
+        <div className="ball-shadow" />
+        <button className="ball" onClick={onBallTap} aria-label={t(lang, "shakeAria")}>
+          <Ball ref={wobbleRef} phase={phase} answer={answer} lang={lang} bubbleSeed={bubbleSeed} />
+        </button>
+        {answer?.rarity && phase === "shown" && sparkleSeed > 0 && <Sparkles seed={sparkleSeed} kind={answer.rarity} />}
+      </div>
+
       {mode === "yesno" ? (
         <>
           <form
@@ -678,19 +692,7 @@ export default function App() {
         <ChooseInputs lang={lang} options={options} onChange={setOptions} recent={recent} disabled={phase === "shaking" || phase === "rising"} />
       )}
 
-      <div className={`stage phase-${phase}`} ref={sceneRef} style={{ "--glow": glow } as React.CSSProperties}>
-        <div className="ball-glow" />
-        <div className="ball-shadow" />
-        <button className="ball" onClick={onBallTap} aria-label={t(lang, "shakeAria")}>
-          <Ball ref={wobbleRef} phase={phase} answer={answer} lang={lang} bubbleSeed={bubbleSeed} />
-        </button>
-        {answer?.rarity && phase === "shown" && sparkleSeed > 0 && <Sparkles seed={sparkleSeed} kind={answer.rarity} />}
-      </div>
-
-      <p className="hint" aria-live="polite" key={hint}>
-        {hint}
-      </p>
-
+      {/* Share and check-in chips live at the very bottom, in a fixed-height block, so nothing above jumps */}
       <div className={`actions ${phase === "shown" ? "visible" : ""}`}>
         <div className="actions-row">
           <button className="share-btn" onClick={onShare} disabled={sharing || phase !== "shown"}>

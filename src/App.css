@@ -167,7 +167,7 @@ button {
   border-radius: 999px;
   border: 1px solid var(--line);
   gap: 2px;
-  margin-bottom: -6px;
+  margin-bottom: -4px;
 }
 
 .mode-switch button {
