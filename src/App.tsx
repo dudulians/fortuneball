@@ -54,7 +54,7 @@ export default function App() {
   const [bubbleSeed, setBubbleSeed] = useState(0);
   const [sparkleSeed, setSparkleSeed] = useState(0);
   const [question, setQuestion] = useState("");
-  /** The question the current answer was given to (the field itself is cleared after the answer). */
+  /** The question the current answer was given to (the field may have been edited since). */
   const [askedQuestion, setAskedQuestion] = useState("");
   const [mode, setMode] = useState<Mode>("yesno");
   const [options, setOptions] = useState<string[]>(["", ""]);
@@ -206,9 +206,8 @@ export default function App() {
         setAskedQuestion(q);
         // A rare answer remembers the question it came up for (shown on the back of its card)
         if (next.rarity) setStats(recordFoundQuestion(next.id, q));
-        // The field empties so the next example question appears right away;
-        // the question itself lives on in the journal and on the share card.
-        setQuestion("");
+        // The question stays in the field until she clears it (×) or taps an example;
+        // auto-clearing was tried on the phone and rejected.
         if (q) {
           // The same open question asked again folds into its first entry (marked ×N);
           // only the first answer gets the "did it come true?" check.
@@ -510,7 +509,8 @@ export default function App() {
     refreshEntries();
   };
 
-  const examplesActive = mode === "yesno" && !question && !listening && (phase === "idle" || phase === "shown");
+  // Examples stay visible with a question in the field: tapping one replaces the question
+  const examplesActive = mode === "yesno" && !listening && (phase === "idle" || phase === "shown");
   // A fresh example after every shake (bubbleSeed grows once per answer)
   const example = useExampleRotation(lang, examplesActive, 6500, bubbleSeed);
 

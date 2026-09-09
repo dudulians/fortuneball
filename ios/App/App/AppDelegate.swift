@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import CoreHaptics
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -7,7 +8,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Shaking is how the ball is asked. Without this, iOS shows its own
+        // "Undo Typing / Redo Typing" alert every time the phone is shaken
+        // after a question has been typed.
+        application.applicationSupportsShakeToEdit = false
         return true
     }
 
@@ -46,4 +50,99 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
 
+}
+
+// MARK: - CoreHaptics plugin
+//
+// Drives the Taptic Engine through Core Haptics directly. The same approach
+// ships in MeMap: on the user's iPhone @capacitor/haptics' UIImpactFeedback-
+// Generator path produced nothing she could feel, Core Haptics did.
+//
+// Lives in AppDelegate.swift so no new source file has to be registered in
+// App.xcodeproj by hand (there is no Mac to drive Xcode). The class is made
+// discoverable by adding "CoreHapticsPlugin" to packageClassList in
+// capacitor.config.json — codemagic.yaml re-injects it after `cap sync`.
+
+@objc(CoreHapticsPlugin)
+public class CoreHapticsPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "CoreHapticsPlugin"
+    public let jsName = "CoreHaptics"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "knock", returnType: CAPPluginReturnNone),
+        CAPPluginMethod(name: "reveal", returnType: CAPPluginReturnNone),
+        CAPPluginMethod(name: "isAvailable", returnType: CAPPluginReturnPromise),
+    ]
+
+    private var engine: CHHapticEngine?
+
+    private var supports: Bool {
+        return CHHapticEngine.capabilitiesForHardware().supportsHaptics
+    }
+
+    public override func load() {
+        guard supports else { return }
+        do {
+            engine = try CHHapticEngine()
+            engine?.stoppedHandler = { [weak self] _ in self?.startEngine() }
+            engine?.resetHandler = { [weak self] in self?.startEngine() }
+            try engine?.start()
+        } catch {
+            print("[CoreHaptics] init failed: \(error)")
+        }
+    }
+
+    private func startEngine() {
+        guard let engine = engine else { return }
+        do {
+            try engine.start()
+        } catch {
+            print("[CoreHaptics] start failed: \(error)")
+        }
+    }
+
+    @objc func isAvailable(_ call: CAPPluginCall) {
+        call.resolve(["available": supports])
+    }
+
+    /// One knock of the die against the wall. intensity / sharpness are 0...1.
+    @objc func knock(_ call: CAPPluginCall) {
+        let intensity = Float(call.getDouble("intensity") ?? 0.5)
+        let sharpness = Float(call.getDouble("sharpness") ?? 0.5)
+        playPattern([transientEvent(at: 0, intensity: intensity, sharpness: sharpness)])
+        call.resolve()
+    }
+
+    /// The die lands on the glass: a heavy thump, then two soft confirming pulses.
+    @objc func reveal(_ call: CAPPluginCall) {
+        let events = [
+            transientEvent(at: 0.0, intensity: 1.0, sharpness: 0.6),
+            transientEvent(at: 0.14, intensity: 0.5, sharpness: 0.5),
+            transientEvent(at: 0.24, intensity: 0.7, sharpness: 0.7),
+        ]
+        playPattern(events)
+        call.resolve()
+    }
+
+    private func transientEvent(at relativeTime: TimeInterval, intensity: Float, sharpness: Float) -> CHHapticEvent {
+        return CHHapticEvent(
+            eventType: .hapticTransient,
+            parameters: [
+                CHHapticEventParameter(parameterID: .hapticIntensity, value: min(max(intensity, 0), 1)),
+                CHHapticEventParameter(parameterID: .hapticSharpness, value: min(max(sharpness, 0), 1)),
+            ],
+            relativeTime: relativeTime
+        )
+    }
+
+    private func playPattern(_ events: [CHHapticEvent]) {
+        guard supports, let engine = engine else { return }
+        do {
+            try engine.start()
+            let pattern = try CHHapticPattern(events: events, parameters: [])
+            let player = try engine.makePlayer(with: pattern)
+            try player.start(atTime: 0)
+        } catch {
+            print("[CoreHaptics] play failed: \(error)")
+        }
+    }
 }
