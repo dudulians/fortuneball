@@ -19,10 +19,13 @@
 
 Особенности iPhone, которые влияют на фишки:
 - Голосовой ввод вопроса (кнопка микрофона у поля) — системное распознавание речи через
-  `@capacitor-community/speech-recognition`, бесплатно, EN/RU. В сессии 5 при `cap add ios`
-  добавить в `Info.plist`: `NSMicrophoneUsageDescription` и `NSSpeechRecognitionUsageDescription`
-  (тексты: "Fortune Ball listens to your question" / "…turns your voice into text").
-  Сказала вопрос → шар трясётся сам, без лишнего тапа.
+  `@capgo/capacitor-speech-recognition` (форк community-плагина с Package.swift: оригинал
+  без него, и сборка Capacitor 8 через Swift Package Manager молча его не включает — CLI так и
+  предупредил при `cap add ios`), бесплатно, EN/RU. `Info.plist` уже содержит
+  `NSMicrophoneUsageDescription`, `NSSpeechRecognitionUsageDescription`, `NSMotionUsageDescription`,
+  `ITSAppUsesNonExemptEncryption=false` (TestFlight не спрашивает про шифрование), только портрет,
+  тёмная тема; в `project.pbxproj` `TARGETED_DEVICE_FAMILY = 1` (только iPhone, iPad-скриншоты
+  в сторе не нужны). Сказала вопрос → шар трясётся сам, без лишнего тапа.
 - Доступ к датчику тряски нужно запросить по тапу пользователя (кнопка «Start» в интро делает это).
 - Уведомления «Сбылось?» тоже требуют разрешения — спрашиваем в момент первого сохранённого вопроса, не при запуске.
 - Чтобы ссылка «Шар для друга» открывала приложение напрямую, нужен свой домен. Без домена

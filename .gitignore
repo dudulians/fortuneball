@@ -16,6 +16,7 @@ android/app/src/main/assets/capacitor.plugins.json
 
 .vscode
 .claude
+.impeccable
 
 # iOS: the generated web copy and build outputs are ignored by ios/.gitignore;
 # the Xcode project, Info.plist, icons and Package.swift are committed on purpose.
