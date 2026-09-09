@@ -1,6 +1,7 @@
 import UIKit
 import Capacitor
 import CoreHaptics
+import AVFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -143,6 +144,36 @@ public class CoreHapticsPlugin: CAPPlugin, CAPBridgedPlugin {
             try player.start(atTime: 0)
         } catch {
             print("[CoreHaptics] play failed: \(error)")
+        }
+    }
+}
+
+// MARK: - AudioSession plugin
+//
+// Speech recognition switches the shared audio session to playAndRecord and
+// leaves it there, after which the web audio in the WebView goes quiet (the
+// user heard the knocks disappear after dictating a question). `restore`
+// puts the session back to the ordinary ambient playback the app started
+// with: respects the silent switch, mixes with music. Called from sound.ts
+// after every dictation and before every shake.
+
+@objc(AudioSessionPlugin)
+public class AudioSessionPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "AudioSessionPlugin"
+    public let jsName = "AudioSession"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "restore", returnType: CAPPluginReturnPromise),
+    ]
+
+    @objc func restore(_ call: CAPPluginCall) {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.ambient, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+            call.resolve(["restored": true])
+        } catch {
+            print("[AudioSession] restore failed: \(error)")
+            call.resolve(["restored": false])
         }
     }
 }

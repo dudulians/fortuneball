@@ -3,6 +3,9 @@
 // glass sphere: muffled knocks while shaking, one soft water "bloop" when
 // the die reaches the window. Nothing else.
 
+import { Capacitor } from "@capacitor/core";
+import AudioSession from "./audioSession";
+
 let ctx: AudioContext | null = null;
 
 function getCtx(): AudioContext | null {
@@ -22,7 +25,36 @@ function getCtx(): AudioContext | null {
 export function unlockAudio(): void {
   const context = getCtx();
   if (!context) return;
-  if (context.state === "suspended") void context.resume();
+  if (sessionDirty) void restoreAudio();
+  else if (context.state !== "running") void context.resume();
+}
+
+// Speech recognition takes the iOS audio session over for the microphone and leaves
+// it in record mode; the knocks then fall silent. After every dictation the session
+// is handed back and the context resumed — and again on the next shake, to be safe.
+let sessionDirty = false;
+
+export function markAudioDirty(): void {
+  sessionDirty = true;
+}
+
+export async function restoreAudio(): Promise<void> {
+  sessionDirty = false;
+  if (Capacitor.isNativePlatform()) {
+    try {
+      await AudioSession.restore();
+    } catch {
+      // plugin missing in this build — resuming the context is all we can do
+    }
+  }
+  const context = getCtx();
+  if (context && context.state !== "running") {
+    try {
+      await context.resume();
+    } catch {
+      // resumes on the next tap
+    }
+  }
 }
 
 /**

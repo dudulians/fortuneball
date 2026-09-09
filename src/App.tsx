@@ -23,7 +23,7 @@ import {
 } from "./history";
 import { listenForShake, listenForTilt, requestMotionPermission, tiltState } from "./motion";
 import { joltHaptic, startRattleHaptics, revealHaptic, tapHaptic } from "./haptics";
-import { playBloopSound, playKnockSound, playShakeSound, unlockAudio } from "./sound";
+import { markAudioDirty, playBloopSound, playKnockSound, playShakeSound, restoreAudio, unlockAudio } from "./sound";
 import { useWobble } from "./useWobble";
 import { GLOW, renderAccuracyCard, renderShareCard } from "./shareCard";
 import { shareImage } from "./share";
@@ -413,15 +413,19 @@ export default function App() {
       onPartial: (text) => setQuestion(text.slice(0, MAX_QUESTION)),
       onEnd: (finalText) => {
         setListening(false);
-        const q = finalText.slice(0, MAX_QUESTION);
-        setQuestion(q);
-        // Said something → the ball answers by itself, no extra tap.
-        if (q.trim()) later(() => void shake(), 450);
+        setQuestion(finalText.slice(0, MAX_QUESTION));
+        // The question is in the field; she shakes the phone herself (auto-shake was
+        // tried on the phone and rejected). Speech left the audio session in record
+        // mode — hand it back once the recognizer has torn down.
+        markAudioDirty();
+        later(() => void restoreAudio(), 400);
       },
       onError: (err) => {
         setListening(false);
         setMicHint(t(micLang, err === "denied" ? "micDenied" : "micFailed"));
         later(() => setMicHint(null), 4500);
+        markAudioDirty();
+        later(() => void restoreAudio(), 400);
       },
     });
   };

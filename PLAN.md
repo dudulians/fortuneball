@@ -51,7 +51,13 @@
   `NSMicrophoneUsageDescription`, `NSSpeechRecognitionUsageDescription`, `NSMotionUsageDescription`,
   `ITSAppUsesNonExemptEncryption=false` (TestFlight не спрашивает про шифрование), только портрет,
   тёмная тема; в `project.pbxproj` `TARGETED_DEVICE_FAMILY = 1` (только iPhone, iPad-скриншоты
-  в сторе не нужны). Сказала вопрос → шар трясётся сам, без лишнего тапа.
+  в сторе не нужны). После диктовки вопрос просто встаёт в поле, трясёт пользователь сама
+  (автотряску после голоса пробовали, на телефоне отклонена: «я хочу потрясти»).
+  Распознавание переводит аудиосессию iOS в playAndRecord и звук ударов пропадает —
+  `AudioSessionPlugin.restore` (в `AppDelegate.swift`, обёртка `src/audioSession.ts`)
+  возвращает `.ambient`; `sound.ts` зовёт его после диктовки и перед следующей тряской.
+- Поле вопроса — заметный «пилюльный» инпут с фоном и рамкой, плейсхолдер ярче, подсказка
+  сверху «Впиши вопрос ниже…»: новому человеку было непонятно, куда вводить вопрос.
 - Доступ к датчику тряски нужно запросить по тапу пользователя (кнопка «Start» в интро делает это).
 - Вибрация на iPhone — через свой плагин Core Haptics (`CoreHapticsPlugin` в
   `ios/App/App/AppDelegate.swift`, JS-обёртка `src/coreHaptics.ts`): первый TestFlight-билд

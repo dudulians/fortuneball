@@ -65,14 +65,14 @@ workflows:
           fi
 
           # `cap sync ios` regenerates ios/App/App/capacitor.config.json and fills
-          # packageClassList from npm packages only. Our CoreHapticsPlugin lives in
-          # AppDelegate.swift (not in node_modules), so re-add it after every sync;
-          # otherwise iOS cannot find the class at startup and the ball has no
-          # vibration (the JS side then falls back to @capacitor/haptics).
+          # packageClassList from npm packages only. Our CoreHapticsPlugin and
+          # AudioSessionPlugin live in AppDelegate.swift (not in node_modules), so
+          # re-add them after every sync; otherwise iOS cannot find the classes at
+          # startup: no vibration, and no sound after dictating a question.
           IOS_CFG="$CM_BUILD_DIR/ios/App/App/capacitor.config.json"
           if [ -f "$IOS_CFG" ]; then
             echo "==> Injecting CoreHapticsPlugin into iOS packageClassList"
-            python3 -c "import json; p='$IOS_CFG'; d=json.load(open(p)); l=d.setdefault('packageClassList', []); 'CoreHapticsPlugin' in l or l.append('CoreHapticsPlugin'); json.dump(d, open(p,'w'), indent=2)"
+            python3 -c "import json; p='$IOS_CFG'; d=json.load(open(p)); l=d.setdefault('packageClassList', []); [l.append(c) for c in ('CoreHapticsPlugin', 'AudioSessionPlugin') if c not in l]; json.dump(d, open(p,'w'), indent=2)"
             echo "==> packageClassList after patch:"
             python3 -c "import json; print(json.load(open('$IOS_CFG')).get('packageClassList'))"
           fi
