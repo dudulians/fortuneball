@@ -45,6 +45,7 @@ const STRINGS = {
 
     // check-ins
     checkInLabel: "Check in",
+    remind: "Remind me to check",
     in1Day: "1 day",
     in3Days: "3 days",
     in1Week: "1 week",
@@ -144,9 +145,10 @@ const STRINGS = {
     needTwoOptions: "Дай шару хотя бы два варианта",
 
     checkInLabel: "Проверить",
-    in1Day: "через день",
+    remind: "Напомнить проверить",
+    in1Day: "день",
     in3Days: "3 дня",
-    in1Week: "неделю",
+    in1Week: "неделя",
     in1Month: "месяц",
     checkInTitle: "Сбылось?",
     youAsked: "Ты спрашивала:",

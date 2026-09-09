@@ -70,6 +70,8 @@ export default function App() {
   const goldenDecisionRef = useRef<"spend" | "skip" | null>(null);
   const [lastEntry, setLastEntry] = useState<HistoryEntry | null>(null);
   const [checkDays, setCheckDays] = useState<number>(DEFAULT_CHECK_IN_DAYS);
+  // the reminder pill is open, showing the four intervals instead of the action row
+  const [pickingDays, setPickingDays] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [shareFailed, setShareFailed] = useState(false);
   const [micAvailable, setMicAvailable] = useState(false);
@@ -534,6 +536,24 @@ export default function App() {
 
   const glow = GLOW[answer?.rarity ?? answer?.tone ?? "positive"];
   const showCheckIn = phase === "shown" && mode === "yesno" && !!lastEntry && !answer?.rarity;
+  const dayLabel = (d: number) => t(lang, d === 1 ? "in1Day" : d === 3 ? "in3Days" : d === 7 ? "in1Week" : "in1Month");
+  const bellIcon = (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden>
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16zM10 20a2 2 0 0 0 4 0"
+      />
+    </svg>
+  );
+
+  // a new shake closes the interval picker
+  useEffect(() => {
+    if (phase !== "shown") setPickingDays(false);
+  }, [phase]);
 
   return (
     <div className="app">
@@ -656,8 +676,7 @@ export default function App() {
               {t(lang, "goldenNext")}
             </div>
           ) : (
-          <div className={`examples ${examplesActive ? "visible" : ""}`} aria-hidden={!examplesActive}>
-            <span className="examples-label">{t(lang, "tryLabel")}:</span>
+          <div className={`examples ${examplesActive ? "visible" : ""}`} aria-hidden={!examplesActive} aria-label={t(lang, "tryLabel")}>
             <button
               type="button"
               className="example-chip"
@@ -692,50 +711,66 @@ export default function App() {
         <ChooseInputs lang={lang} options={options} onChange={setOptions} recent={recent} disabled={phase === "shaking" || phase === "rising"} />
       )}
 
-      {/* Share and check-in chips live at the very bottom, in a fixed-height block, so nothing above jumps */}
+      {/* One fixed-height row at the very bottom: "Share" and the reminder pill (a bell with the
+          chosen interval). Tapping the pill swaps the row for the four intervals; nothing above jumps. */}
       <div className={`actions ${phase === "shown" ? "visible" : ""}`}>
-        <div className="actions-row">
-          <button className="share-btn" onClick={onShare} disabled={sharing || phase !== "shown"}>
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
-              <path
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 3v13M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"
-              />
-            </svg>
-            {t(lang, "share")}
-          </button>
-          {rareShown && (
-            <button
-              className={`chip rare-chip ${answer?.rarity ?? ""}`}
-              onClick={() => {
-                refreshEntries();
-                setJournalTab("collection");
-                setJournalOpen(true);
-              }}
-            >
-              ✦ {t(lang, "openCollection")}
+        {showCheckIn && pickingDays ? (
+          <div className="checkin" role="radiogroup" aria-label={t(lang, "remind")}>
+            <span className="checkin-label" aria-hidden>
+              {bellIcon}
+            </span>
+            {CHECK_IN_DAYS.map((d) => (
+              <button
+                type="button"
+                role="radio"
+                aria-checked={checkDays === d}
+                key={d}
+                className={`chip ${checkDays === d ? "active" : ""}`}
+                onClick={() => {
+                  setPickingDays(false);
+                  void onCheckDays(d);
+                }}
+              >
+                {dayLabel(d)}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="actions-row">
+            <button className="share-btn" onClick={onShare} disabled={sharing || phase !== "shown"}>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 3v13M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"
+                />
+              </svg>
+              {t(lang, "share")}
             </button>
-          )}
-        </div>
+            {rareShown && (
+              <button
+                className={`chip rare-chip ${answer?.rarity ?? ""}`}
+                onClick={() => {
+                  refreshEntries();
+                  setJournalTab("collection");
+                  setJournalOpen(true);
+                }}
+              >
+                ✦ {t(lang, "openCollection")}
+              </button>
+            )}
+            {showCheckIn && (
+              <button className="share-btn remind-btn" onClick={() => setPickingDays(true)} aria-label={t(lang, "remind")}>
+                {bellIcon}
+                {dayLabel(checkDays)}
+              </button>
+            )}
+          </div>
+        )}
         {shareFailed && <p className="share-error">{t(lang, "shareError")}</p>}
-        <div className={`checkin ${showCheckIn ? "visible" : ""}`} aria-hidden={!showCheckIn}>
-          <span className="checkin-label">{t(lang, "checkInLabel")}:</span>
-          {CHECK_IN_DAYS.map((d) => (
-            <button
-              type="button"
-              key={d}
-              className={`chip ${checkDays === d ? "active" : ""}`}
-              tabIndex={showCheckIn ? 0 : -1}
-              onClick={() => void onCheckDays(d)}
-            >
-              {t(lang, d === 1 ? "in1Day" : d === 3 ? "in3Days" : d === 7 ? "in1Week" : "in1Month")}
-            </button>
-          ))}
-        </div>
       </div>
       </div>
 

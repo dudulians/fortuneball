@@ -1029,13 +1029,14 @@ button {
 
 /* Fixed height: the share row and the check-in row always have their space,
    so the ball never moves when they appear or disappear. */
+/* One row under the field: "Share" and the reminder pill (or, while picking, the four
+   intervals). Fixed height, so nothing above it moves when the row appears. */
 .actions {
-  height: 98px;
+  height: 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
+  justify-content: center;
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;
@@ -1047,7 +1048,7 @@ button {
   gap: 10px;
 }
 
-/* "Check in: 1 day · 3 days · 1 week · 1 month" — takes its place at once, then fades in */
+/* The interval picker: a bell, then "1 day · 3 days · 1 week · 1 month" */
 .checkin {
   height: 34px;
   display: flex;
@@ -1055,9 +1056,7 @@ button {
   justify-content: center;
   flex-wrap: nowrap;
   gap: 6px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  animation: softIn 0.2s ease both;
 }
 
 .checkin.visible {
@@ -1133,7 +1132,7 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 24px;
+  padding: 11px 20px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: transparent;
@@ -1168,6 +1167,24 @@ button {
   padding: 8px 16px;
   font-size: var(--fs-caption);
   margin-top: 10px;
+}
+
+/* the reminder pill: a bell and the chosen interval, same shape as "Share" */
+.remind-btn {
+  gap: 8px;
+}
+
+.remind-btn svg {
+  width: 15px;
+  height: 15px;
+  margin-left: -0.1em;
+}
+
+.checkin-label svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+  color: var(--ink-40);
 }
 
 .share-error {
