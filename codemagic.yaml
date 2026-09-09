@@ -1,0 +1,138 @@
+# Codemagic CI/CD configuration for Fortune Ball (Capacitor 8 + Vite + React).
+#
+# A copy of the pipeline that ships MeMap, with only the app-specific values
+# changed. It builds the iOS app on a managed Apple Silicon Mac in the cloud
+# and uploads the build to TestFlight through the App Store Connect
+# integration that already exists in the Codemagic account (alias
+# `codemagic`, the same API key MeMap uses — nothing new to create).
+#
+# One-time setup in the Codemagic UI for THIS app only:
+#   App settings → environment → integrations → enable "App Store Connect"
+#   with the integration alias `codemagic` (matches `auth: integration`).
+#
+# Never run this workflow at the same time as a MeMap build: both pipelines
+# revoke and re-create the team's distribution certificate, so two builds
+# racing each other will make one of them fail at "Set up code signing".
+# Just start it again.
+
+workflows:
+  ios-testflight:
+    name: Fortune Ball iOS — TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    integrations:
+      app_store_connect: codemagic
+
+    # No `ios_signing:` block: certificate and profile are created explicitly
+    # in the "Set up code signing" script below (same approach as MeMap).
+    environment:
+      vars:
+        # Capacitor 8 uses Swift Package Manager (no CocoaPods), so there is
+        # an App.xcodeproj and no workspace.
+        XCODE_PROJECT: "App.xcodeproj"
+        XCODE_SCHEME: "App"
+        BUNDLE_ID: "com.uliana.fortuneball"
+        APPLE_TEAM_ID: "X4QQRGJ6C4"
+      node: 22.11.0
+      xcode: latest
+      cocoapods: default
+
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          npm ci
+
+      - name: Build the web bundle
+        script: |
+          npm run build
+
+      - name: Capacitor sync iOS
+        script: |
+          npx cap sync ios
+          # Capacitor 8 on Windows generates Package.swift with backslash
+          # path separators (..\..\..\node_modules\...) which Swift PM on
+          # macOS cannot resolve — plugins silently fail to link and native
+          # APIs (haptics, speech, share) return success but do nothing.
+          # Rewrite backslashes to forward slashes.
+          PKG="$CM_BUILD_DIR/ios/App/CapApp-SPM/Package.swift"
+          if [ -f "$PKG" ]; then
+            echo "==> Package.swift BEFORE patch:"
+            grep "node_modules" "$PKG" || echo "(no node_modules lines)"
+            python3 -c "p='$PKG'; d=open(p).read(); open(p,'w').write(d.replace(chr(92),'/'))"
+            echo "==> Package.swift AFTER patch:"
+            grep "node_modules" "$PKG" || echo "(no node_modules lines)"
+          fi
+
+      - name: Set up code signing
+        script: |
+          set -e
+          echo "==> Initialize keychain"
+          keychain initialize
+
+          echo "==> Revoke stale distribution certificates"
+          # Apple allows 2 active distribution certificates per team. Every
+          # build generates a fresh private key, so certificates from earlier
+          # builds (of this app or of MeMap) are useless here — revoke them,
+          # otherwise the API answers 409 and the build dies. Revoking does
+          # not affect builds already uploaded to TestFlight or the store.
+          for FILTER_TYPE in DISTRIBUTION IOS_DISTRIBUTION; do
+            echo "    listing certs of type $FILTER_TYPE"
+            RAW=$(app-store-connect certificates list --type "$FILTER_TYPE" --json 2>/dev/null || echo "[]")
+            IDS=$(echo "$RAW" | python3 -c "import json,sys; d=json.loads(sys.stdin.read() or '[]'); items = d if isinstance(d, list) else d.get('data', []); print(' '.join(c.get('id','') for c in items if c))" 2>/dev/null || echo "")
+            if [ -n "$IDS" ]; then
+              for cert_id in $IDS; do
+                echo "    revoke $cert_id"
+                app-store-connect certificates revoke "$cert_id" || true
+              done
+            else
+              echo "    none found for $FILTER_TYPE"
+            fi
+          done
+
+          echo "==> Generate private key for the new distribution cert"
+          openssl genrsa -out /tmp/cert_private_key.pem 2048
+
+          echo "==> Fetch signing files (creates cert + profile, registers the bundle id if missing)"
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --certificate-key=@file:/tmp/cert_private_key.pem \
+            --create
+
+          echo "==> Add downloaded cert to keychain"
+          keychain add-certificates
+
+          echo "==> Patch Xcode project to use the fetched profile"
+          cd $CM_BUILD_DIR/ios/App
+          xcode-project use-profiles --code-signing-setup-verbose-logging
+
+      - name: Set build number
+        script: |
+          # Apple rejects an upload whose CFBundleVersion was used before.
+          # A Unix timestamp is always strictly increasing and never collides.
+          cd $CM_BUILD_DIR/ios/App
+          BUILD_NUMBER=$(date +%s)
+          echo "==> Setting build number to $BUILD_NUMBER"
+          agvtool new-version -all "$BUILD_NUMBER"
+
+      - name: Build ipa
+        script: |
+          cd $CM_BUILD_DIR/ios/App
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME" \
+            --archive-xcargs "DEVELOPMENT_TEAM=$APPLE_TEAM_ID"
+
+    artifacts:
+      - ios/App/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        # Upload only. Internal testers (members of the App Store Connect
+        # team) can install from the TestFlight app right after processing,
+        # no Apple review needed. External testers would need
+        # submit_to_testflight: true plus a beta group.
+        submit_to_testflight: false

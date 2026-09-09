@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Fortune Ball</string>
+    <string name="title_activity_main">Fortune Ball</string>
+    <string name="package_name">com.ulian.fortuneball</string>
+    <string name="custom_url_scheme">com.ulian.fortuneball</string>
+</resources>

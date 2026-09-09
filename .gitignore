@@ -1,0 +1,21 @@
+node_modules
+dist
+.DS_Store
+*.log
+
+# Android build outputs (keep source, drop built artifacts)
+android/app/build
+android/build
+android/.gradle
+android/local.properties
+android/.idea
+android/capacitor-cordova-android-plugins
+android/app/src/main/assets/public
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+
+.vscode
+.claude
+
+# iOS: the generated web copy and build outputs are ignored by ios/.gitignore;
+# the Xcode project, Info.plist, icons and Package.swift are committed on purpose.
