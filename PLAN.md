@@ -17,7 +17,7 @@
 3. Codemagic → Add application → `dudulians/fortuneball` → Start new build, workflow
    «Fortune Ball iOS — TestFlight». Ключ App Store Connect уже в аккаунте под именем `codemagic`.
 4. TestFlight → Internal Testing → поставить на iPhone.
-5. Выложить `store/privacy-policy.html` по публичному адресу (Apple требует Privacy Policy URL)
+5. Выложить папку `store/site/` по публичному адресу (Apple требует Privacy Policy URL)
    и вписать в него свою почту вместо `[email]`/`[почта]`.
 6. Завести AdMob (приложение + межстраничный блок + сообщение о согласии GDPR) и подставить
    оба id вместо тестовых: App ID → `ios/App/App/Info.plist`, блок → `src/ads.ts`.
@@ -316,7 +316,7 @@ AdMob, встроенная покупка) — там же то, что нуж�
   `scripts/store-frames.mjs` добавляет подпись сверху, набранную Manrope в самой странице
   приложения. Обоим нужен `playwright-core` (уже в devDependencies) и установленный Chrome.
 - **Тексты.** `store/STORE.md` — название, подзаголовок, ключевые слова, описание EN/RU,
-  заметки для ревью, категории. `store/privacy-policy.html` — страница политики, ей нужен
+  заметки для ревью, категории. `store/site/index.html` — страница политики, ей нужен
   только публичный адрес.
 - Заодно исправлена строка точности: было «проверено 8 из 11» (читается как «проверено 8»),
   стало «8 из 11 сбылись» / «8 of 11 came true» — и в журнале, и на карточке для шеринга.

@@ -165,7 +165,7 @@ node scripts/store-frames.mjs ru 1284x2778
 | Secondary category | Lifestyle |
 | Age rating | 4+ (ничего из анкеты Apple в приложении нет; реклама ограничена рейтингом General) |
 | Price | Free (деньги — со встроенной покупки и рекламы) |
-| Privacy Policy URL | обязательное поле, страницу надо выложить — см. `store/privacy-policy.html` |
+| Privacy Policy URL | обязательное поле, страницу надо выложить — см. `store/site/` |
 | Support URL | можно ту же страницу или почту |
 | Encryption | уже отвечено в сборке (`ITSAppUsesNonExemptEncryption=false` в Info.plist) |
 | Sign-in required | нет |
@@ -266,8 +266,9 @@ App Store Connect → приложение → **Features → In-App Purchases �
 ## 10. Что осталось сделать руками
 
 1. Выложить политику приватности по публичному адресу и вписать его в Privacy Policy URL.
-   `store/privacy-policy.html` — готовая страница, ей нужен только хостинг
-   (GitHub Pages публичного репозитория, Netlify Drop, любой свой домен).
+   `store/site/` — готовая папка: перетащить её на app.netlify.com/drop или положить
+   в публичный репозиторий с GitHub Pages, и адрес готов. Внутри один `index.html`,
+   так что адресом политики будет сам корень сайта.
 2. AdMob: завести приложение и рекламный блок, подставить оба id (раздел 8).
 3. App Store Connect → создать приложение, вписать всё из этого файла, завести покупку
    (раздел 9), заполнить App Privacy (раздел 7).
