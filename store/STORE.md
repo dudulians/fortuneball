@@ -119,15 +119,21 @@ Fortune Ball — тот самый шар из детства, пересобр�
 
 ## 5. Скриншоты
 
-Пять штук, 1320×2868 (6.9", iPhone 16 Pro Max) — Apple сама уменьшит их для остальных
-размеров, отдельно снимать не нужно.
+Пять штук на язык. Папки разложены по размеру, потому что **каждый слот в App Store
+Connect принимает только свои размеры** — чужой отбивается словами «The dimensions of one
+or more screenshots are wrong»:
 
-Два комплекта на каждый язык, загружать какой-то один:
+| Слот в App Store Connect | Что грузить |
+|---|---|
+| iPhone 6.5" Display (просит 1242×2688 или 1284×2778) | `screenshots/1284x2778/` |
+| iPhone 6.9" Display (просит 1290×2796 или 1320×2868) | `screenshots/1320x2868/` |
+
+Внутри каждого размера — четыре папки:
 
 | Папка | Что это |
 |---|---|
-| `screenshots/en-captioned/`, `screenshots/ru-captioned/` | с подписью сверху — **этот и грузим** |
-| `screenshots/en/`, `screenshots/ru/` | чистые кадры без подписей, на всякий случай |
+| `en-captioned/`, `ru-captioned/` | с подписью сверху — **этот комплект и грузим** |
+| `en/`, `ru/` | чистые кадры без подписей, на всякий случай |
 
 Порядок в комплекте с подписями уже правильный: ответ → журнал с точностью → «Выбрать» →
 золотой ответ → коллекция. Первый скриншот виден в поиске, поэтому он и есть ответ в шаре.
@@ -135,11 +141,15 @@ Fortune Ball — тот самый шар из детства, пересобр�
 Пересобрать (нужен запущенный `npm run dev` на порту 5174):
 
 ```
-node scripts/store-screenshots.mjs en
-node scripts/store-screenshots.mjs ru
-node scripts/store-frames.mjs en
-node scripts/store-frames.mjs ru
+node scripts/store-screenshots.mjs en 1284x2778
+node scripts/store-screenshots.mjs ru 1284x2778
+node scripts/store-frames.mjs en 1284x2778
+node scripts/store-frames.mjs ru 1284x2778
 ```
+
+Размеры, которые понимают скрипты, перечислены в `scripts/store-sizes.mjs`:
+`1320x2868`, `1290x2796`, `1284x2778`, `1242x2688`. Нужен ещё один — добавить строку туда
+и прогнать те же четыре команды.
 
 ---
 

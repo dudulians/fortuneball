@@ -1,23 +1,36 @@
 /**
  * App Store screenshots, taken from the running app — no phone, no simulator.
  *
- * Drives the dev server in headless Chrome at 440x956 CSS px with a 3x pixel
- * ratio, which is exactly the 1320x2868 that App Store Connect wants for the
- * 6.9" iPhone. Storage is seeded first, so the journal has a history worth
- * showing and the collection has rare answers already found.
+ * Drives the dev server in headless Chrome at a phone's CSS size with a 3x
+ * pixel ratio, which lands exactly on a size App Store Connect accepts.
+ * Storage is seeded first, so the journal has a history worth showing and the
+ * collection has rare answers already found.
  *
  *   npm run dev                       (in another terminal, port 5174)
  *   npm i -D playwright-core          (once; it drives the installed Chrome)
- *   node scripts/store-screenshots.mjs en
- *   node scripts/store-screenshots.mjs ru
+ *   node scripts/store-screenshots.mjs en 1284x2778
+ *   node scripts/store-screenshots.mjs ru 1284x2778
  *
- * Output: store/screenshots/<lang>/01..05.png
+ * Output: store/screenshots/<size>/<lang>/01..05.png
+ *
+ * Which size goes where (App Store Connect refuses anything else in a slot):
+ *   1320x2868, 1290x2796 — iPhone 6.9"
+ *   1284x2778, 1242x2688 — iPhone 6.5"
+ * Upload the largest slot the app record offers; Apple scales it down for the
+ * smaller ones.
  */
 import { chromium } from "playwright-core";
 import { mkdirSync } from "fs";
+import { SIZES } from "./store-sizes.mjs";
 
 const LANG = process.argv[2] === "ru" ? "ru" : "en";
-const OUT = `store/screenshots/${LANG}`;
+const SIZE = process.argv[3] ?? "1284x2778";
+const VIEWPORT = SIZES[SIZE];
+if (!VIEWPORT) {
+  console.error(`Unknown size ${SIZE}. Try one of: ${Object.keys(SIZES).join(", ")}`);
+  process.exit(1);
+}
+const OUT = `store/screenshots/${SIZE}/${LANG}`;
 const URL = process.env.URL ?? "http://localhost:5174/";
 const CHROME = process.env.CHROME ?? "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const DAY = 86400000;
@@ -115,7 +128,7 @@ const browser = await chromium.launch({
   args: ["--enable-unsafe-swiftshader"], // WebGL liquid without a GPU
 });
 const ctx = await browser.newContext({
-  viewport: { width: 440, height: 956 },
+  viewport: VIEWPORT,
   deviceScaleFactor: 3,
   isMobile: true,
   hasTouch: true,
@@ -176,5 +189,5 @@ await page.click(".tabs button:nth-child(2)");
 await page.waitForTimeout(900);
 await shot("05-collection");
 
-console.log(`${OUT}: five screenshots, 1320x2868`);
+console.log(`${OUT}: five screenshots, ${SIZE}`);
 await browser.close();
