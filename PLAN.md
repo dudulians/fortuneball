@@ -21,7 +21,7 @@
    Почта поддержки в ней — memap.support@gmail.com, та же, что у MeMap.
 6. Завести AdMob (приложение + межстраничный блок + сообщение о согласии GDPR) и подставить
    оба id вместо тестовых: App ID → `ios/App/App/Info.plist`, блок → `src/ads.ts`.
-7. Завести встроенную покупку `com.uliana.fortuneball.removeads` и подписать
+7. Завести встроенную покупку `com.uliana.fortuneball.noads` и подписать
    Paid Applications Agreement — без него цена не подтянется даже в TestFlight.
    Пошагово — `store/STORE.md`, разделы 8 и 9.
 
@@ -281,7 +281,8 @@ AdMob, встроенная покупка) — там же то, что нуж�
   (та же болячка, что после диктовки).
 - **Покупка** — `src/purchases.ts` + `StoreKitPlugin` в `ios/App/App/AppDelegate.swift`
   (StoreKit 2, без RevenueCat: один товар того не стоит, а лишний SDK — это лишние строки
-  в App Privacy). Товар `com.uliana.fortuneball.removeads`, non-consumable. Ответ App Store
+  в App Privacy). Товар `com.uliana.fortuneball.noads`, non-consumable (первый id,
+  `…removeads`, сгорел: App Store Connect резервирует Product ID навсегда, даже удалённый). Ответ App Store
   кэшируется в localStorage, иначе в первые секунды после запуска плательщик успел бы
   увидеть рекламу. В настройках две строки: цена (её форматирует сам App Store) и
   «Восстановить покупку».

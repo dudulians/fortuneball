@@ -201,7 +201,7 @@ public class StoreKitPlugin: CAPPlugin, CAPBridgedPlugin {
     ]
 
     /// Must match the product id created in App Store Connect.
-    private static let productId = "com.uliana.fortuneball.removeads"
+    private static let productId = "com.uliana.fortuneball.noads"
 
     private var updates: Task<Void, Never>?
 

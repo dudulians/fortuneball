@@ -244,7 +244,7 @@ App Store Connect → приложение → **Features → In-App Purchases �
 |---|---|
 | Type | Non-Consumable (разовая, навсегда) |
 | Reference Name | Remove ads |
-| Product ID | `com.uliana.fortuneball.removeads` — **ровно так**, id зашит в коде |
+| Product ID | `com.uliana.fortuneball.noads` — **ровно так**, id зашит в коде |
 | Price | Tier 3 (~$2.99) |
 | Display Name (EN) | `Remove ads` |
 | Description (EN) | `Turns off the ads for good. The ball stays exactly as it is.` |
