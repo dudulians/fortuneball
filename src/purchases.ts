@@ -29,6 +29,11 @@ const StoreKitPurchases = registerPlugin<StoreKitPurchasesPlugin>("StoreKitPurch
   }),
 });
 
+/** Only iPhone has a store to buy from; web and Android show nothing. */
+export function purchasesSupported(): boolean {
+  return Capacitor.getPlatform() === "ios";
+}
+
 const CACHE_KEY = "fortuneball.removedAds.v1";
 
 function readCache(): boolean {

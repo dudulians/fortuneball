@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Settings } from "./settings";
 import { t } from "./i18n";
-import { buyRemoveAds, hasRemovedAds, removeAdsPrice, restorePurchases } from "./purchases";
+import { buyRemoveAds, hasRemovedAds, purchasesSupported, removeAdsPrice, restorePurchases } from "./purchases";
 
 interface Props {
   open: boolean;
@@ -17,6 +17,7 @@ export default function SettingsModal({ open, settings, onChange, onClose, onAds
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const removed = hasRemovedAds();
+  const onDevice = purchasesSupported();
 
   // The App Store knows the price in this person's currency — ask only when the
   // row is actually on screen, and only while there is something to sell.
@@ -129,24 +130,26 @@ export default function SettingsModal({ open, settings, onChange, onClose, onAds
           </div>
         </div>
 
-        {price && !removed && (
+        {/* On the phone both rows always show. Hiding them when the App Store is
+            slow to answer left someone who had already paid with no way to
+            restore — and no way to tell "not for sale" from "not loaded yet". */}
+        {onDevice && !removed && (
           <div className="row">
             <span>{t(lang, "removeAds")}</span>
-            <button type="button" className="buy-btn" disabled={busy} onClick={() => void buy()}>
-              {price}
+            <button type="button" className="buy-btn" disabled={busy || !price} onClick={() => void buy()}>
+              {price ?? "—"}
             </button>
           </div>
         )}
 
-        {removed ? (
-          <p className="settings-note">{t(lang, "removeAdsDone")}</p>
-        ) : (
-          price && (
+        {onDevice &&
+          (removed ? (
+            <p className="settings-note">{t(lang, "removeAdsDone")}</p>
+          ) : (
             <button type="button" className="restore-btn" disabled={busy} onClick={() => void restore()}>
               {t(lang, "restorePurchase")}
             </button>
-          )
-        )}
+          ))}
 
         {note && <p className="settings-note">{note}</p>}
 
