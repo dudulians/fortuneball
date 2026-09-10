@@ -18,6 +18,9 @@
 | 2 | `Fortune Ball: Ask & Shake` | `Fortune Ball: спроси и тряси` |
 | 3 | `Fortune Ball — Yes or No` | `Fortune Ball — да или нет` |
 
+> Первое имя в App Store Connect было «Fortune Ball: Magic 8 Answers» — заменено
+> 10.09.2026, до первой отправки на ревью. Меняется в App Information → Name.
+
 **Subtitle** (максимум 30 знаков):
 
 - EN: `Ask, shake, get an answer`
