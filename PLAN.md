@@ -18,7 +18,7 @@
    «Fortune Ball iOS — TestFlight». Ключ App Store Connect уже в аккаунте под именем `codemagic`.
 4. TestFlight → Internal Testing → поставить на iPhone.
 5. Выложить папку `store/site/` по публичному адресу (Apple требует Privacy Policy URL)
-   и вписать в него свою почту вместо `[email]`/`[почта]`.
+   Почта поддержки в ней — memap.support@gmail.com, та же, что у MeMap.
 6. Завести AdMob (приложение + межстраничный блок + сообщение о согласии GDPR) и подставить
    оба id вместо тестовых: App ID → `ios/App/App/Info.plist`, блок → `src/ads.ts`.
 7. Завести встроенную покупку `com.uliana.fortuneball.removeads` и подписать
