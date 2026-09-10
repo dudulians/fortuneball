@@ -34,6 +34,8 @@ import { loadRecentChoices, rememberChoice } from "./choices";
 import { wrapForDie } from "./wrapText";
 import { cancelCheckIn, ensureReminderPermission, onReminderTap, scheduleCheckIn } from "./reminders";
 import { accuracy } from "./history";
+import { adDue, initAds, showInterstitial, stopAds } from "./ads";
+import { refreshPurchases } from "./purchases";
 
 const SHAKE_MS = 1300;   // a tap-driven shake: ball rattles, "8" face turns away
 const MIN_SHAKE_MS = 900; // a real shake never ends before this, even if the hand stops early
@@ -130,6 +132,14 @@ export default function App() {
       setMode: (m: Mode) => setMode(m),
     };
   }, [updateSettings]);
+
+  // Ads and the purchase that turns them off. Both are asked once, after the
+  // intro is out of the way: the consent form must not be the first thing a new
+  // person sees, and nothing here may block the first shake.
+  useEffect(() => {
+    if (!settings.hasSeenIntro) return;
+    void refreshPurchases().then(() => void initAds());
+  }, [settings.hasSeenIntro]);
 
   const later = useCallback((fn: () => void, ms: number) => {
     const id = window.setTimeout(fn, ms);
@@ -259,6 +269,18 @@ export default function App() {
         setGoldenConfirm(true);
         return false;
       }
+      // The ad, if one is due, goes here: before anything is played or
+      // animated, so it never lands on top of an answer being read. The shake
+      // then starts by itself the moment the ad is closed.
+      if (adDue(loadStats().shakes, isGoldenDue(loadStats()))) {
+        busyRef.current = true;
+        void showInterstitial().then(() => {
+          busyRef.current = false;
+          beginShakeRef.current?.(source);
+        });
+        return false;
+      }
+
       busyRef.current = true;
       shakeSourceRef.current = source;
       shakeStartedAtRef.current = performance.now();
@@ -295,6 +317,11 @@ export default function App() {
     },
     [kick, later, finishShake]
   );
+
+  // beginShake calls itself once an ad is out of the way; a ref keeps that from
+  // being a circular dependency.
+  const beginShakeRef = useRef<typeof beginShake | null>(null);
+  beginShakeRef.current = beginShake;
 
   const shake = useCallback(async () => {
     beginShake("tap");
@@ -778,7 +805,13 @@ export default function App() {
       </div>
       </div>
 
-      <SettingsModal open={settingsOpen} settings={settings} onChange={updateSettings} onClose={() => setSettingsOpen(false)} />
+      <SettingsModal
+        open={settingsOpen}
+        settings={settings}
+        onChange={updateSettings}
+        onClose={() => setSettingsOpen(false)}
+        onAdsRemoved={stopAds}
+      />
 
       <JournalSheet
         open={journalOpen}

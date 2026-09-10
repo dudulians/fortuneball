@@ -86,7 +86,9 @@ Most answers are the classics. Some are rare: a golden one comes on your 15th sh
 ASK OUT LOUD
 Tap the microphone and say your question instead of typing it.
 
-Everything stays on your phone. No account, no sign-up, nothing leaves the device. English and Russian.
+Everything stays on your phone. No account, no sign-up, your questions never leave the device. English and Russian.
+
+Free, with an occasional full-screen ad between shakes — never on your first ones, never on top of a rare answer. One tap in Settings removes the ads for good.
 
 For entertainment only.
 ```
@@ -110,7 +112,9 @@ Fortune Ball — тот самый шар из детства, пересобр�
 СПРОСИ ГОЛОСОМ
 Нажми микрофон и скажи вопрос вслух, вместо того чтобы печатать.
 
-Всё хранится на телефоне. Ни аккаунта, ни регистрации, ничего не уходит с устройства. Английский и русский.
+Всё хранится на телефоне. Ни аккаунта, ни регистрации, вопросы не уходят с устройства. Английский и русский.
+
+Бесплатно, между трясками иногда появляется реклама на весь экран — никогда в первые тряски и никогда поверх редкого ответа. Одна кнопка в настройках убирает её навсегда.
 
 Только для развлечения.
 ```
@@ -159,33 +163,116 @@ node scripts/store-frames.mjs ru 1284x2778
 |---|---|
 | Primary category | Entertainment |
 | Secondary category | Lifestyle |
-| Age rating | 4+ (ничего из анкеты Apple в приложении нет) |
-| Price | Free |
+| Age rating | 4+ (ничего из анкеты Apple в приложении нет; реклама ограничена рейтингом General) |
+| Price | Free (деньги — со встроенной покупки и рекламы) |
 | Privacy Policy URL | обязательное поле, страницу надо выложить — см. `store/privacy-policy.html` |
 | Support URL | можно ту же страницу или почту |
-| App Privacy | **Data Not Collected** — приложение не собирает ничего |
 | Encryption | уже отвечено в сборке (`ITSAppUsesNonExemptEncryption=false` в Info.plist) |
 | Sign-in required | нет |
+| Contains ads | да (галочка при создании приложения) |
 
 ### Notes for App Review (вписать в поле Review Notes)
 
 ```
-No account and no server: everything the app stores stays on the device.
+No account and no server: the questions, the answers and the settings stay on the device.
 
 - Microphone and speech recognition: only to dictate the question into the text field. iOS on-device speech, nothing is uploaded.
 - Motion: to detect the shake that reveals the answer.
 - Notifications: optional reminder that asks whether the answer came true. Asked for only after the first saved question.
+- Ads: Google AdMob, a full-screen ad roughly every eighth shake, never on the first shakes and never on top of a rare answer. Ads are non-personalised, so the app does not use App Tracking Transparency and does not track.
+- In-app purchase: "Remove ads", one-time, non-consumable. It is in Settings (the gear in the top right corner). Restore purchase is right under it.
 
 The app is a toy fortune ball. It makes no claim of real prediction and says so in the description.
 ```
 
 ---
 
-## 7. Что осталось сделать руками
+## 7. App Privacy (анкета «Data Collection»)
+
+Из-за рекламы ответ больше не «Data Not Collected». Само приложение по-прежнему не собирает
+ничего — всё, что ниже, собирает SDK рекламы Google. Заполнять так:
+
+**Вопрос «Do you or your third-party partners collect data from this app?» → Yes.**
+
+| Категория Apple | Что отмечать | Purposes | Linked to identity | Used for tracking |
+|---|---|---|---|---|
+| Identifiers → Device ID | Да | Third-Party Advertising | Нет | **Нет** |
+| Usage Data → Product Interaction | Да | Third-Party Advertising, Analytics | Нет | **Нет** |
+| Diagnostics → Crash Data | Да | App Functionality | Нет | Нет |
+| Diagnostics → Performance Data | Да | App Functionality | Нет | Нет |
+| Location → Coarse Location | Да | Third-Party Advertising | Нет | **Нет** |
+| Всё остальное (контакты, фото, здоровье, покупки, поиск, контент) | Не отмечать | | | |
+
+Почему везде «Used for tracking — No»: приложение запрашивает **неперсонализированную**
+рекламу (`npa: true` в `src/ads.ts`), не показывает окно App Tracking Transparency и не имеет
+доступа к рекламному идентификатору. Если когда-нибудь включить персонализацию — эти ответы
+придётся поменять на Yes и добавить ATT.
+
+Вопросы человека (текст вопроса в шаре) и журнал — **не отмечать нигде**: они не покидают
+телефон.
+
+---
+
+## 8. AdMob: что завести до релиза
+
+1. [admob.google.com](https://admob.google.com) → Apps → Add app → iOS → «Fortune Ball».
+   Пока приложения нет в сторе, выбрать «Not listed yet»; после публикации связать с ним.
+2. Скопировать **App ID** (вида `ca-app-pub-XXXXXXXX~YYYYYYYY`) в
+   `ios/App/App/Info.plist`, ключ `GADApplicationIdentifier` — сейчас там **тестовый** id
+   Google. Без правильного id приложение падает на запуске.
+3. Ad units → Add ad unit → **Interstitial** → скопировать id (`ca-app-pub-XXXXXXXX/ZZZZZZZZ`)
+   в `src/ads.ts`, константа `INTERSTITIAL_AD_ID` — там тоже пока тестовый.
+4. Privacy & messaging → **GDPR** → создать сообщение о согласии и опубликовать.
+   Без него форма согласия в Европе не покажется, и реклама там не пойдёт.
+   Там же **US states** — включить, если нужно.
+5. Пока id тестовые, реклама показывается «заглушкой» Google — это нормально для TestFlight,
+   на свою рекламу нельзя кликать самой (за это блокируют аккаунт).
+6. `app-ads.txt` — нужен, только когда появится свой сайт; кладётся в корень домена,
+   который указан в App Store Connect как Marketing URL. Без него реклама работает, но
+   покупателей меньше.
+
+**Как реклама ведёт себя в приложении** (`src/ads.ts`, там же все числа):
+первая — не раньше 12-й тряски, дальше каждая 8-я (12, 20, 28…), не чаще одного раза
+в 90 секунд, не в первые 45 секунд после запуска, никогда поверх золотого или космического
+ответа и никогда у того, кто купил «Убрать рекламу».
+
+---
+
+## 9. Встроенная покупка «Убрать рекламу»
+
+App Store Connect → приложение → **Features → In-App Purchases → +**
+
+| Поле | Значение |
+|---|---|
+| Type | Non-Consumable (разовая, навсегда) |
+| Reference Name | Remove ads |
+| Product ID | `com.uliana.fortuneball.removeads` — **ровно так**, id зашит в коде |
+| Price | Tier 3 (~$2.99) |
+| Display Name (EN) | `Remove ads` |
+| Description (EN) | `Turns off the ads for good. The ball stays exactly as it is.` |
+| Display Name (RU) | `Убрать рекламу` |
+| Description (RU) | `Выключает рекламу навсегда. Сам шар остаётся прежним.` |
+| Review Screenshot | `store/iap-review-screenshot.png` (экран настроек с ценой) |
+| Review Notes | `Settings (gear, top right) → "Remove ads". Restore purchase is under it.` |
+
+Покупку нужно отправить на ревью **вместе с первой сборкой** — иначе она останется
+в статусе «Waiting for Review» и в приложении цена не появится.
+
+Ещё: Agreements, Tax, and Banking → **Paid Applications** договор должен быть подписан,
+иначе покупка не будет работать вообще и в TestFlight цена не подтянется.
+
+---
+
+## 10. Что осталось сделать руками
 
 1. Выложить политику приватности по публичному адресу и вписать его в Privacy Policy URL.
    `store/privacy-policy.html` — готовая страница, ей нужен только хостинг
    (GitHub Pages публичного репозитория, Netlify Drop, любой свой домен).
-2. App Store Connect → создать приложение, вписать всё из этого файла.
-3. Загрузить скриншоты из `screenshots/en-captioned/` и `screenshots/ru-captioned/`.
-4. Отправить сборку из TestFlight на ревью.
+2. AdMob: завести приложение и рекламный блок, подставить оба id (раздел 8).
+3. App Store Connect → создать приложение, вписать всё из этого файла, завести покупку
+   (раздел 9), заполнить App Privacy (раздел 7).
+4. Загрузить скриншоты из `screenshots/1284x2778/en-captioned/` и `.../ru-captioned/`.
+5. Подписать Paid Applications Agreement.
+6. Новая сборка через Codemagic (в ней и реклама, и покупка) → TestFlight → проверить
+   на телефоне: цена видна, покупка проходит, реклама после 12-й тряски, после покупки
+   рекламы нет → отправить на ревью.

@@ -101,6 +101,14 @@ const STRINGS = {
     rareFound: "A rare answer for your collection",
     shareAccuracyTitle: "My Fortune Ball is right",
     shareAccuracyOfTime: "of the time",
+
+    // remove ads
+    removeAds: "Remove ads",
+    removeAdsDone: "Ads are off. Thank you.",
+    restorePurchase: "Restore purchase",
+    restoreNothing: "No purchase found on this Apple ID.",
+    purchasePending: "Waiting for approval.",
+    purchaseFailed: "The purchase didn't go through.",
   },
   ru: {
     appName: "Fortune Ball",
@@ -199,6 +207,14 @@ const STRINGS = {
     rareFound: "Редкий ответ в твою коллекцию",
     shareAccuracyTitle: "Мой Fortune Ball угадывает в",
     shareAccuracyOfTime: "случаев",
+
+    // убрать рекламу
+    removeAds: "Убрать рекламу",
+    removeAdsDone: "Реклама выключена. Спасибо.",
+    restorePurchase: "Восстановить покупку",
+    restoreNothing: "На этом Apple ID покупки нет.",
+    purchasePending: "Ждём подтверждения.",
+    purchaseFailed: "Покупка не прошла.",
   },
 } as const;
 

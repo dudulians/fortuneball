@@ -2,6 +2,7 @@ import UIKit
 import Capacitor
 import CoreHaptics
 import AVFoundation
+import StoreKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -174,6 +175,127 @@ public class AudioSessionPlugin: CAPPlugin, CAPBridgedPlugin {
         } catch {
             print("[AudioSession] restore failed: \(error)")
             call.resolve(["restored": false])
+        }
+    }
+}
+
+// MARK: - StoreKit plugin
+//
+// One product: "Remove ads", non-consumable. StoreKit 2 straight from the
+// system — a single purchase does not need RevenueCat, and every extra SDK is
+// one more thing to declare in App Privacy.
+//
+// Lives here for the same reason the other two do: no Mac, so no new file can
+// be added to App.xcodeproj by hand. "StoreKitPlugin" is re-injected into
+// packageClassList by codemagic.yaml after every `cap sync`.
+
+@objc(StoreKitPlugin)
+public class StoreKitPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "StoreKitPlugin"
+    public let jsName = "StoreKitPurchases"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "status", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "price", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "purchase", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "restore", returnType: CAPPluginReturnPromise),
+    ]
+
+    /// Must match the product id created in App Store Connect.
+    private static let productId = "com.uliana.fortuneball.removeads"
+
+    private var updates: Task<Void, Never>?
+
+    public override func load() {
+        // A purchase can finish while the app was closed (interrupted payment,
+        // Ask to Buy, a refund). Without this listener those transactions are
+        // never finished and StoreKit keeps replaying them.
+        updates = Task.detached {
+            for await update in Transaction.updates {
+                if case .verified(let transaction) = update {
+                    await transaction.finish()
+                }
+            }
+        }
+    }
+
+    deinit {
+        updates?.cancel()
+    }
+
+    private static func isOwned() async -> Bool {
+        for await result in Transaction.currentEntitlements {
+            if case .verified(let transaction) = result,
+               transaction.productID == productId,
+               transaction.revocationDate == nil {
+                return true
+            }
+        }
+        return false
+    }
+
+    @objc func status(_ call: CAPPluginCall) {
+        Task {
+            let owned = await Self.isOwned()
+            call.resolve(["owned": owned])
+        }
+    }
+
+    /// The price as the App Store formats it for this person's storefront.
+    @objc func price(_ call: CAPPluginCall) {
+        Task {
+            do {
+                let products = try await Product.products(for: [Self.productId])
+                guard let product = products.first else {
+                    call.resolve(["available": false, "price": ""])
+                    return
+                }
+                call.resolve(["available": true, "price": product.displayPrice])
+            } catch {
+                print("[StoreKit] price failed: \(error)")
+                call.resolve(["available": false, "price": ""])
+            }
+        }
+    }
+
+    @objc func purchase(_ call: CAPPluginCall) {
+        Task {
+            do {
+                let products = try await Product.products(for: [Self.productId])
+                guard let product = products.first else {
+                    call.reject("The product is not available in this store yet.")
+                    return
+                }
+                switch try await product.purchase() {
+                case .success(let verification):
+                    if case .verified(let transaction) = verification {
+                        await transaction.finish()
+                        call.resolve(["owned": true, "cancelled": false])
+                    } else {
+                        call.reject("The purchase could not be verified.")
+                    }
+                case .userCancelled:
+                    let owned = await Self.isOwned()
+                    call.resolve(["owned": owned, "cancelled": true])
+                case .pending:
+                    // Ask to Buy, or a payment method that needs a step elsewhere.
+                    call.resolve(["owned": false, "cancelled": false, "pending": true])
+                @unknown default:
+                    let owned = await Self.isOwned()
+                    call.resolve(["owned": owned, "cancelled": false])
+                }
+            } catch {
+                print("[StoreKit] purchase failed: \(error)")
+                call.reject("Purchase failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    /// Same Apple ID, new phone.
+    @objc func restore(_ call: CAPPluginCall) {
+        Task {
+            try? await AppStore.sync()
+            let owned = await Self.isOwned()
+            call.resolve(["owned": owned])
         }
     }
 }

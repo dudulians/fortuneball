@@ -12,6 +12,7 @@
     "assets": "node scripts/svg-to-png.mjs && capacitor-assets generate --android"
   },
   "dependencies": {
+    "@capacitor-community/admob": "^8.1.0",
     "@capacitor/android": "^8.3.1",
     "@capacitor/core": "^8.3.1",
     "@capacitor/filesystem": "^8.1.3",

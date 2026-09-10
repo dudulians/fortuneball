@@ -22,6 +22,24 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<!-- AdMob application id. This is Google's public TEST id: it serves test
+	     ads and earns nothing. Replace it with the real one from the AdMob
+	     account before release (store/STORE.md, section "AdMob"), together with
+	     the interstitial id in src/ads.ts. A wrong or missing id here crashes
+	     the app on launch. -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<!-- Ads are non-personalised and the app never asks to track, so no
+	     NSUserTrackingUsageDescription. SKAdNetwork lets advertisers measure
+	     installs without any identifier; Google's own id is the one that
+	     matters, the rest of the network list can be added later. -->
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
