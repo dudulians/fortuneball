@@ -63,7 +63,7 @@ const STRINGS = {
     tabCollection: "Collection",
     accuracyTitle: "Ball accuracy",
     accuracyNone: "Nothing checked yet",
-    accuracyChecked: "checked",
+    accuracyCameTrue: "came true",
     of: "of",
     statusWaiting: "Waiting",
     statusYes: "Came true",
@@ -101,7 +101,6 @@ const STRINGS = {
     rareFound: "A rare answer for your collection",
     shareAccuracyTitle: "My Fortune Ball is right",
     shareAccuracyOfTime: "of the time",
-    shareAccuracyChecked: "answers checked",
   },
   ru: {
     appName: "Fortune Ball",
@@ -162,7 +161,7 @@ const STRINGS = {
     tabCollection: "Коллекция",
     accuracyTitle: "Точность шара",
     accuracyNone: "Пока ничего не проверено",
-    accuracyChecked: "проверено",
+    accuracyCameTrue: "сбылись",
     of: "из",
     statusWaiting: "Ждём",
     statusYes: "Сбылось",
@@ -200,7 +199,6 @@ const STRINGS = {
     rareFound: "Редкий ответ в твою коллекцию",
     shareAccuracyTitle: "Мой Fortune Ball угадывает в",
     shareAccuracyOfTime: "случаев",
-    shareAccuracyChecked: "ответов проверено",
   },
 } as const;
 

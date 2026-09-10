@@ -109,7 +109,7 @@ export default function JournalSheet({
                 <>
                   <div className="accuracy-value">{acc.percent}%</div>
                   <div className="accuracy-sub">
-                    {t(lang, "accuracyChecked")} {acc.hits} {t(lang, "of")} {acc.checked}
+                    {acc.hits} {t(lang, "of")} {acc.checked} {t(lang, "accuracyCameTrue")}
                   </div>
                   <button className="share-btn small" onClick={onShareAccuracy} disabled={sharing}>
                     {t(lang, "share")}

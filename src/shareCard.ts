@@ -110,7 +110,7 @@ export async function renderAccuracyCard({ percent, hits, checked, lang }: Accur
 
   ctx.fillStyle = "rgba(241,238,232,0.45)";
   ctx.font = `500 36px "Manrope", Arial, sans-serif`;
-  ctx.fillText(`${hits} ${t(lang, "of")} ${checked} · ${t(lang, "shareAccuracyChecked")}`, W / 2, 1050);
+  ctx.fillText(`${hits} ${t(lang, "of")} ${checked} ${t(lang, "accuracyCameTrue")}`, W / 2, 1050);
 
   const size = 420;
   ctx.save();
