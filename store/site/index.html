@@ -4,148 +4,232 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fortune Ball — Privacy Policy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: dark; }
+  :root {
+    color-scheme: dark;
+    --ink: #f1eee8;
+    --ink-60: rgba(241, 238, 232, 0.62);
+    --ink-40: rgba(241, 238, 232, 0.42);
+    --line: rgba(241, 238, 232, 0.14);
+  }
+  * { box-sizing: border-box; }
   body {
     margin: 0;
-    padding: 48px 22px 80px;
+    padding: 28px 22px 80px;
     background: #07070b;
-    color: #f1eee8;
+    color: var(--ink);
     font: 16px/1.6 "Manrope", "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
   main { max-width: 640px; margin: 0 auto; }
-  h1 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 6px; }
-  h2 { font-size: 20px; letter-spacing: -0.01em; margin: 40px 0 8px; }
+
+  /* The same pill the app uses for EN / RU, so the page feels like the app. */
+  .lang {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 28px;
+  }
+  .segmented {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    gap: 2px;
+  }
+  .segmented button {
+    border: 0;
+    background: transparent;
+    color: var(--ink-60);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 7px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+  }
+  .segmented button[aria-pressed="true"] {
+    background: var(--ink);
+    color: #0b0b12;
+  }
+
+  h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 6px; }
+  h2 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; margin: 40px 0 8px; }
   p, li { color: rgba(241, 238, 232, 0.82); }
-  .date { color: rgba(241, 238, 232, 0.45); font-size: 14px; margin: 0 0 36px; }
-  hr { border: 0; border-top: 1px solid rgba(241, 238, 232, 0.14); margin: 56px 0; }
+  .date { color: var(--ink-40); font-size: 14px; margin: 0 0 36px; }
   ul { padding-left: 20px; }
   a { color: #8fa0ff; }
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--ink-40); font-size: 14px; }
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
 <main>
 
-<h1>Fortune Ball — Privacy Policy</h1>
-<p class="date">Last updated: 10 September 2026</p>
-
-<p>Fortune Ball has no account, no sign-up and no server of its own. Your questions, your
-answers and your settings never leave your phone. The one exception is the advertising
-described below.</p>
-
-<h2>What the app stores</h2>
-<p>Everything the app remembers is stored on your device only, and is deleted when you
-delete the app:</p>
-<ul>
-  <li>the questions you type and the answers the ball gave;</li>
-  <li>whether you marked an answer as having come true;</li>
-  <li>the rare answers you have found and how many times you have shaken the ball;</li>
-  <li>your settings: language, sound, vibration, reminders.</li>
-</ul>
-<p>You can erase all of it inside the app: Journal → Clear all.</p>
-
-<h2>Permissions</h2>
-<ul>
-  <li><strong>Microphone and speech recognition</strong> — only when you tap the microphone
-    button to dictate a question. The recognition is done by iOS; the app receives the text
-    and stores nothing else. Audio is not recorded or uploaded.</li>
-  <li><strong>Motion</strong> — to notice the shake that reveals an answer.</li>
-  <li><strong>Notifications</strong> — for the optional reminder that asks whether an answer
-    came true. Asked for only after your first saved question, and can be turned off in
-    Settings.</li>
-</ul>
-
-<h2>Advertising</h2>
-<p>The free version shows an occasional full-screen ad between shakes, served by Google
-AdMob. The ads are <strong>non-personalised</strong>: the app never asks permission to
-track you, does not use the advertising identifier for tracking, and does not build a
-profile of you. AdMob still receives technical data needed to show and count an ad —
-a device identifier, coarse country-level location, the fact that an ad was shown or
-tapped, and crash and performance diagnostics. That data is handled under
-<a href="https://policies.google.com/technologies/partner-sites">Google's privacy policy</a>.</p>
-<p>Where the law requires it (the EEA, the UK, some US states), Google's consent form
-appears before the first ad, and your choice can be changed there.</p>
-<p>Buying <strong>Remove ads</strong> switches the advertising off entirely — after that
-no ad is requested and no ad SDK data is sent.</p>
-
-<h2>The purchase</h2>
-<p>Remove ads is a one-time purchase handled entirely by Apple. The app never sees your
-payment details; it only asks the App Store whether this Apple ID owns the purchase.</p>
-
-<h2>What the app does not do</h2>
-<p>No accounts, no analytics of its own, no tracking across apps or websites, no selling
-of data, no sharing of your questions with anyone. When you use Share, iOS hands the
-picture to whichever app you choose — that happens outside Fortune Ball.</p>
-
-<h2>Children</h2>
-<p>The app is a toy fortune ball for entertainment. It collects no data from anyone,
-children included.</p>
-
-<h2>Contact</h2>
-<p>Questions about this policy: <a href="mailto:memap.support@gmail.com">memap.support@gmail.com</a></p>
-
-<hr>
-
-<h1 lang="ru">Fortune Ball — политика конфиденциальности</h1>
-<p class="date" lang="ru">Обновлено: 10 сентября 2026</p>
-
-<div lang="ru">
-<p>У Fortune Ball нет ни аккаунта, ни регистрации, ни своего сервера. Вопросы, ответы и
-настройки не покидают телефон. Единственное исключение — реклама, о ней ниже.</p>
-
-<h2>Что хранится</h2>
-<p>Всё, что приложение запоминает, лежит только на вашем устройстве и удаляется вместе
-с приложением:</p>
-<ul>
-  <li>вопросы, которые вы вписали, и ответы шара;</li>
-  <li>отметки о том, сбылся ответ или нет;</li>
-  <li>найденные редкие ответы и число тряс;</li>
-  <li>настройки: язык, звук, вибрация, напоминания.</li>
-</ul>
-<p>Всё это можно стереть в самом приложении: Журнал → Очистить всё.</p>
-
-<h2>Разрешения</h2>
-<ul>
-  <li><strong>Микрофон и распознавание речи</strong> — только когда вы нажимаете кнопку
-    микрофона, чтобы продиктовать вопрос. Распознаёт сама iOS, приложение получает текст.
-    Аудио не записывается и никуда не отправляется.</li>
-  <li><strong>Движение</strong> — чтобы заметить тряску, после которой появляется ответ.</li>
-  <li><strong>Уведомления</strong> — для необязательного напоминания «сбылось?». Спрашиваем
-    только после первого сохранённого вопроса, выключается в настройках.</li>
-</ul>
-
-<h2>Реклама</h2>
-<p>В бесплатной версии между трясками иногда показывается полноэкранная реклама Google
-AdMob. Реклама <strong>неперсонализированная</strong>: приложение не спрашивает разрешения
-на отслеживание, не использует рекламный идентификатор для слежки и не собирает ваш
-профиль. AdMob всё же получает технические данные, без которых рекламу не показать и не
-посчитать: идентификатор устройства, приблизительное местоположение на уровне страны,
-факт показа или нажатия, диагностику сбоев и производительности. Эти данные обрабатываются
-по <a href="https://policies.google.com/technologies/partner-sites">политике Google</a>.</p>
-<p>Там, где этого требует закон (ЕЭЗ, Великобритания, часть штатов США), перед первой
-рекламой появляется форма согласия Google — решение можно изменить там же.</p>
-<p>Покупка <strong>«Убрать рекламу»</strong> выключает рекламу совсем: после неё запросов
-к рекламной сети не происходит.</p>
-
-<h2>Покупка</h2>
-<p>«Убрать рекламу» — разовая покупка, которую целиком проводит Apple. Приложение не видит
-платёжных данных, оно только спрашивает у App Store, куплено ли это на текущем Apple ID.</p>
-
-<h2>Чего приложение не делает</h2>
-<p>Ни аккаунтов, ни собственной аналитики, ни слежки по другим приложениям и сайтам, ни
-продажи данных, ни передачи ваших вопросов кому-либо. Когда вы нажимаете «Поделиться»,
-картинку передаёт сама iOS в выбранное вами приложение — это происходит уже за пределами
-Fortune Ball.</p>
-
-<h2>Дети</h2>
-<p>Приложение — игрушечный шар предсказаний для развлечения. Оно не собирает данные ни
-у кого, включая детей.</p>
-
-<h2>Связь</h2>
-<p>Вопросы по политике: <a href="mailto:memap.support@gmail.com">memap.support@gmail.com</a></p>
+<div class="lang">
+  <div class="segmented" role="group" aria-label="Language">
+    <button type="button" id="btn-en" aria-pressed="true">EN</button>
+    <button type="button" id="btn-ru" aria-pressed="false">RU</button>
+  </div>
 </div>
 
+<section id="doc-en">
+  <h1>Fortune Ball — Privacy Policy</h1>
+  <p class="date">Last updated: 10 September 2026</p>
+
+  <p>Fortune Ball has no account, no sign-up and no server of its own. Your questions, your
+  answers and your settings never leave your phone. The one exception is the advertising
+  described below.</p>
+
+  <h2>What the app stores</h2>
+  <p>Everything the app remembers is stored on your device only, and is deleted when you
+  delete the app:</p>
+  <ul>
+    <li>the questions you type and the answers the ball gave;</li>
+    <li>whether you marked an answer as having come true;</li>
+    <li>the rare answers you have found and how many times you have shaken the ball;</li>
+    <li>your settings: language, sound, vibration, reminders.</li>
+  </ul>
+  <p>You can erase all of it inside the app: Journal → Clear all.</p>
+
+  <h2>Permissions</h2>
+  <ul>
+    <li><strong>Microphone and speech recognition</strong> — only when you tap the microphone
+      button to dictate a question. The recognition is done by iOS; the app receives the text
+      and stores nothing else. Audio is not recorded or uploaded.</li>
+    <li><strong>Motion</strong> — to notice the shake that reveals an answer.</li>
+    <li><strong>Notifications</strong> — for the optional reminder that asks whether an answer
+      came true. Asked for only after your first saved question, and can be turned off in
+      Settings.</li>
+  </ul>
+
+  <h2>Advertising</h2>
+  <p>The free version shows an occasional full-screen ad between shakes, served by Google
+  AdMob. The ads are <strong>non-personalised</strong>: the app never asks permission to
+  track you, does not use the advertising identifier for tracking, and does not build a
+  profile of you. AdMob still receives technical data needed to show and count an ad —
+  a device identifier, coarse country-level location, the fact that an ad was shown or
+  tapped, and crash and performance diagnostics. That data is handled under
+  <a href="https://policies.google.com/technologies/partner-sites">Google's privacy policy</a>.</p>
+  <p>Where the law requires it (the EEA, the UK, some US states), Google's consent form
+  appears before the first ad, and your choice can be changed there.</p>
+  <p>Buying <strong>Remove ads</strong> switches the advertising off entirely — after that
+  no ad is requested and no ad SDK data is sent.</p>
+
+  <h2>The purchase</h2>
+  <p>Remove ads is a one-time purchase handled entirely by Apple. The app never sees your
+  payment details; it only asks the App Store whether this Apple ID owns the purchase.</p>
+
+  <h2>What the app does not do</h2>
+  <p>No accounts, no analytics of its own, no tracking across apps or websites, no selling
+  of data, no sharing of your questions with anyone. When you use Share, iOS hands the
+  picture to whichever app you choose — that happens outside Fortune Ball.</p>
+
+  <h2>Children</h2>
+  <p>The app is a toy fortune ball for entertainment. It collects no data from anyone,
+  children included.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy:
+    <a href="mailto:memap.support@gmail.com">memap.support@gmail.com</a></p>
+</section>
+
+<section id="doc-ru" lang="ru" hidden>
+  <h1>Fortune Ball — политика конфиденциальности</h1>
+  <p class="date">Обновлено: 10 сентября 2026</p>
+
+  <p>У Fortune Ball нет ни аккаунта, ни регистрации, ни своего сервера. Вопросы, ответы и
+  настройки не покидают телефон. Единственное исключение — реклама, о ней ниже.</p>
+
+  <h2>Что хранится</h2>
+  <p>Всё, что приложение запоминает, лежит только на вашем устройстве и удаляется вместе
+  с приложением:</p>
+  <ul>
+    <li>вопросы, которые вы вписали, и ответы шара;</li>
+    <li>отметки о том, сбылся ответ или нет;</li>
+    <li>найденные редкие ответы и число тряс;</li>
+    <li>настройки: язык, звук, вибрация, напоминания.</li>
+  </ul>
+  <p>Всё это можно стереть в самом приложении: Журнал → Очистить всё.</p>
+
+  <h2>Разрешения</h2>
+  <ul>
+    <li><strong>Микрофон и распознавание речи</strong> — только когда вы нажимаете кнопку
+      микрофона, чтобы продиктовать вопрос. Распознаёт сама iOS, приложение получает текст.
+      Аудио не записывается и никуда не отправляется.</li>
+    <li><strong>Движение</strong> — чтобы заметить тряску, после которой появляется ответ.</li>
+    <li><strong>Уведомления</strong> — для необязательного напоминания «сбылось?». Спрашиваем
+      только после первого сохранённого вопроса, выключается в настройках.</li>
+  </ul>
+
+  <h2>Реклама</h2>
+  <p>В бесплатной версии между трясками иногда показывается полноэкранная реклама Google
+  AdMob. Реклама <strong>неперсонализированная</strong>: приложение не спрашивает разрешения
+  на отслеживание, не использует рекламный идентификатор для слежки и не собирает ваш
+  профиль. AdMob всё же получает технические данные, без которых рекламу не показать и не
+  посчитать: идентификатор устройства, приблизительное местоположение на уровне страны,
+  факт показа или нажатия, диагностику сбоев и производительности. Эти данные обрабатываются
+  по <a href="https://policies.google.com/technologies/partner-sites">политике Google</a>.</p>
+  <p>Там, где этого требует закон (ЕЭЗ, Великобритания, часть штатов США), перед первой
+  рекламой появляется форма согласия Google — решение можно изменить там же.</p>
+  <p>Покупка <strong>«Убрать рекламу»</strong> выключает рекламу совсем: после неё запросов
+  к рекламной сети не происходит.</p>
+
+  <h2>Покупка</h2>
+  <p>«Убрать рекламу» — разовая покупка, которую целиком проводит Apple. Приложение не видит
+  платёжных данных, оно только спрашивает у App Store, куплено ли это на текущем Apple ID.</p>
+
+  <h2>Чего приложение не делает</h2>
+  <p>Ни аккаунтов, ни собственной аналитики, ни слежки по другим приложениям и сайтам, ни
+  продажи данных, ни передачи ваших вопросов кому-либо. Когда вы нажимаете «Поделиться»,
+  картинку передаёт сама iOS в выбранное вами приложение — это происходит уже за пределами
+  Fortune Ball.</p>
+
+  <h2>Дети</h2>
+  <p>Приложение — игрушечный шар предсказаний для развлечения. Оно не собирает данные ни
+  у кого, включая детей.</p>
+
+  <h2>Связь</h2>
+  <p>Вопросы по политике:
+    <a href="mailto:memap.support@gmail.com">memap.support@gmail.com</a></p>
+</section>
+
+<footer id="foot-en">Fortune Ball · <a href="mailto:memap.support@gmail.com">memap.support@gmail.com</a></footer>
+<footer id="foot-ru" hidden>Fortune Ball · <a href="mailto:memap.support@gmail.com">memap.support@gmail.com</a></footer>
+
 </main>
+
+<script>
+  // Both languages ship in the page; the switch only decides which one shows.
+  // A reviewer at Apple or Google lands on the one their browser asks for and
+  // never has to scroll past a language they cannot read.
+  (function () {
+    var docs = { en: document.getElementById('doc-en'), ru: document.getElementById('doc-ru') };
+    var btns = { en: document.getElementById('btn-en'), ru: document.getElementById('btn-ru') };
+    var foots = { en: document.getElementById('foot-en'), ru: document.getElementById('foot-ru') };
+
+    function show(lang) {
+      ['en', 'ru'].forEach(function (l) {
+        docs[l].hidden = l !== lang;
+        foots[l].hidden = l !== lang;
+        btns[l].setAttribute('aria-pressed', String(l === lang));
+      });
+      document.documentElement.lang = lang;
+      try { localStorage.setItem('fortuneball.policyLang', lang); } catch (e) {}
+    }
+
+    var saved = null;
+    try { saved = localStorage.getItem('fortuneball.policyLang'); } catch (e) {}
+    var guess = (navigator.language || 'en').toLowerCase().indexOf('ru') === 0 ? 'ru' : 'en';
+    show(saved === 'ru' || saved === 'en' ? saved : guess);
+
+    btns.en.addEventListener('click', function () { show('en'); });
+    btns.ru.addEventListener('click', function () { show('ru'); });
+  })();
+</script>
 </body>
 </html>

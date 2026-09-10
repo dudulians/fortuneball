@@ -4,15 +4,12 @@ import { AdMob, AdmobConsentStatus, InterstitialAdPluginEvents, MaxAdContentRati
 import AudioSession from "./audioSession";
 import { hasRemovedAds } from "./purchases";
 
-/* ------------------------------------------------------------------ *
- * The ids. Replace both before release — see store/STORE.md, "AdMob". *
- * ------------------------------------------------------------------ *
- * These are Google's public test ids: they always fill, they never earn
- * anything, and using them in a live app is the safe failure. The real
- * interstitial id goes here; the real app id goes into Info.plist
- * (GADApplicationIdentifier).
- */
-const INTERSTITIAL_AD_ID = "ca-app-pub-3940256099942544/4411468910";
+/* The live interstitial from the AdMob account. Its other half — the app id —
+ * lives in ios/App/App/Info.plist as GADApplicationIdentifier. Both are real,
+ * which means the ads on the phone are real: look at them, never tap them.
+ * Google's test unit, if one is ever needed again, is
+ * ca-app-pub-3940256099942544/4411468910. */
+const INTERSTITIAL_AD_ID = "ca-app-pub-5868480097993711/1994062304";
 
 /* ---------------- When an ad is allowed to appear ---------------- *
  * The ball is a five-second ritual. An ad that lands on the wrong
