@@ -34,8 +34,9 @@ import { loadRecentChoices, rememberChoice } from "./choices";
 import { wrapForDie } from "./wrapText";
 import { cancelCheckIn, ensureReminderPermission, onReminderTap, scheduleCheckIn } from "./reminders";
 import { accuracy } from "./history";
-import { adDue, initAds, showInterstitial, stopAds } from "./ads";
+import { adDue, showInterstitial, stopAds, warmAds } from "./ads";
 import { refreshPurchases } from "./purchases";
+import { rememberLastAnswer, restoreLastAnswer } from "./lastAnswer";
 
 const SHAKE_MS = 1300;   // a tap-driven shake: ball rattles, "8" face turns away
 const MIN_SHAKE_MS = 900; // a real shake never ends before this, even if the hand stops early
@@ -49,15 +50,18 @@ const DEFAULT_CHECK_IN_DAYS = 7;
 
 type Mode = "yesno" | "choose";
 
+/** Read once, before the first render: what the page was showing if it just restarted. */
+const RESTORED = restoreLastAnswer();
+
 export default function App() {
   const [settings, updateSettings] = useSettings();
-  const [phase, setPhase] = useState<Phase>("idle");
-  const [answer, setAnswer] = useState<Answer | null>(null);
+  const [phase, setPhase] = useState<Phase>(RESTORED ? "shown" : "idle");
+  const [answer, setAnswer] = useState<Answer | null>(RESTORED?.answer ?? null);
   const [bubbleSeed, setBubbleSeed] = useState(0);
   const [sparkleSeed, setSparkleSeed] = useState(0);
-  const [question, setQuestion] = useState("");
+  const [question, setQuestion] = useState(RESTORED?.question ?? "");
   /** The question the current answer was given to (the field may have been edited since). */
-  const [askedQuestion, setAskedQuestion] = useState("");
+  const [askedQuestion, setAskedQuestion] = useState(RESTORED?.question ?? "");
   const [mode, setMode] = useState<Mode>("yesno");
   const [options, setOptions] = useState<string[]>(["", ""]);
   const [recent, setRecent] = useState<string[][]>(() => loadRecentChoices());
@@ -81,7 +85,7 @@ export default function App() {
   const [micHint, setMicHint] = useState<string | null>(null);
 
   const busyRef = useRef(false);
-  const phaseRef = useRef<Phase>("idle");
+  const phaseRef = useRef<Phase>(RESTORED ? "shown" : "idle");
   phaseRef.current = phase;
   const shakeSourceRef = useRef<"tap" | "motion">("tap");
   const shakeStartedAtRef = useRef(0);
@@ -133,13 +137,19 @@ export default function App() {
     };
   }, [updateSettings]);
 
-  // Ads and the purchase that turns them off. Both are asked once, after the
-  // intro is out of the way: the consent form must not be the first thing a new
-  // person sees, and nothing here may block the first shake.
+  // Does this Apple ID already own the ad-free version?
   useEffect(() => {
     if (!settings.hasSeenIntro) return;
-    void refreshPurchases().then(() => void initAds());
+    void refreshPurchases();
   }, [settings.hasSeenIntro]);
+
+  // The ad SDK wakes up one shake before an ad is due and holds nothing the
+  // rest of the time — a prepared interstitial sitting in memory was costing
+  // the page its life on the phone.
+  useEffect(() => {
+    if (!settings.hasSeenIntro) return;
+    void warmAds(stats.shakes);
+  }, [settings.hasSeenIntro, stats.shakes]);
 
   const later = useCallback((fn: () => void, ms: number) => {
     const id = window.setTimeout(fn, ms);
@@ -194,6 +204,8 @@ export default function App() {
 
     later(() => {
       setPhase("shown");
+      // Written down so a restart mid-read does not wipe the answer off the ball.
+      rememberLastAnswer(next, questionRef.current.trim());
       void revealHaptic(settingsRef.current.haptics);
       if (next.rarity) {
         setSparkleSeed((s) => s + 1);

@@ -50,33 +50,48 @@ async function preload(): Promise<void> {
 }
 
 /**
- * Consent (Europe asks for it), SDK, first ad in the pocket. Safe to call on
- * web and safe to call twice.
+ * Everything heavy about advertising is deferred to the shake before an ad is
+ * due, and nothing is kept loaded afterwards.
+ *
+ * The first version started the SDK and held a prepared interstitial from
+ * launch. On the phone that showed up as the app freezing for a moment around
+ * the fifteenth shake and coming back at its first screen: iOS had run out of
+ * room and thrown away the web page, which is a lot of memory to spend on an
+ * ad that is still ten shakes away. A prepared interstitial can hold a video.
  */
-export async function initAds(): Promise<void> {
-  if (initialised || !isNative() || hasRemovedAds()) return;
-  initialised = true;
-  try {
-    // UMP: shows Google's consent form where the law requires one. We only ever
-    // request non-personalised ads, but the form is still what makes ads
-    // servable in the EEA and the UK.
-    const consent = await AdMob.requestConsentInfo();
-    if (consent.isConsentFormAvailable && consent.status === AdmobConsentStatus.REQUIRED) {
-      await AdMob.showConsentForm();
+export async function warmAds(shakesSoFar: number): Promise<void> {
+  if (!isNative() || hasRemovedAds() || showing) return;
+  // One shake of warning is enough for the SDK to have an ad in hand.
+  if (!isAdShake(shakesSoFar + 1) && !isAdShake(shakesSoFar + 2)) return;
+  if (!initialised) {
+    initialised = true;
+    try {
+      // UMP: Google's consent form, where the law requires one. We only ever
+      // request non-personalised ads, but the form is still what makes ads
+      // servable in the EEA and the UK.
+      const consent = await AdMob.requestConsentInfo();
+      if (consent.isConsentFormAvailable && consent.status === AdmobConsentStatus.REQUIRED) {
+        await AdMob.showConsentForm();
+      }
+    } catch {
+      // No consent flow available — ads still serve outside the regulated regions.
     }
-  } catch {
-    // No consent flow available — ads still serve outside the regulated regions.
+    try {
+      await AdMob.initialize({
+        initializeForTesting: false,
+        // The app is rated 4+; the ads in it have to match.
+        maxAdContentRating: MaxAdContentRating.General,
+      });
+    } catch {
+      return;
+    }
   }
-  try {
-    await AdMob.initialize({
-      initializeForTesting: false,
-      // The app is rated 4+; the ads in it have to match.
-      maxAdContentRating: MaxAdContentRating.General,
-    });
-  } catch {
-    return;
-  }
-  await preload();
+  if (!ready) await preload();
+}
+
+/** Is the n-th shake of this ball's life an ad shake? */
+function isAdShake(n: number): boolean {
+  return n >= FIRST_AD_AT_SHAKE && (n - FIRST_AD_AT_SHAKE) % EVERY_N_SHAKES === 0;
 }
 
 /** The shake that is about to happen: should it be preceded by an ad? */
@@ -86,9 +101,7 @@ export function adDue(shakesSoFar: number, goldenDue: boolean): boolean {
   if (goldenDue) return false;
   if (Date.now() - launchedAt < QUIET_AFTER_LAUNCH_MS) return false;
   if (Date.now() - lastShownAt < MIN_GAP_MS) return false;
-  const next = shakesSoFar + 1;
-  if (next < FIRST_AD_AT_SHAKE) return false;
-  return (next - FIRST_AD_AT_SHAKE) % EVERY_N_SHAKES === 0;
+  return isAdShake(shakesSoFar + 1);
 }
 
 /**
@@ -99,8 +112,7 @@ export function adDue(shakesSoFar: number, goldenDue: boolean): boolean {
 export async function showInterstitial(): Promise<void> {
   if (!isNative() || hasRemovedAds() || showing) return;
   if (!ready) {
-    // Nothing loaded (offline, no fill): let it go and try again next time.
-    void preload();
+    // Nothing in hand (offline, no fill, warmed too late): let the shake through.
     return;
   }
   showing = true;
@@ -134,7 +146,8 @@ export async function showInterstitial(): Promise<void> {
     } catch {
       // not on a device
     }
-    void preload();
+    // No preloading here: the next ad is five shakes away, and warmAds will
+    // fetch it one shake before it is needed.
   }
 }
 
