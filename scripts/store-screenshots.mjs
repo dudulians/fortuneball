@@ -135,10 +135,13 @@ const shot = (name) => page.screenshot({ path: `${OUT}/${name}.png` });
 await page.goto(URL, { waitUntil: "networkidle" });
 await page.waitForTimeout(1500);
 
-// 1 — a question answered
+// 1 — a question answered. The roll is random and the first screenshot is the one
+// people see in search, so the answer is set to a yes after the shake plays out.
 await page.fill(".question input", DATA.heroQuestion);
 await page.click(".ball");
 await page.waitForTimeout(4200);
+await page.evaluate(() => window.__fortune.setAnswer("p03"));
+await page.waitForTimeout(800);
 await shot("01-answer");
 
 // 2 — a golden answer, sparkles still in the air
