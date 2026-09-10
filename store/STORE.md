@@ -182,7 +182,7 @@ No account and no server: the questions, the answers and the settings stay on th
 - Microphone and speech recognition: only to dictate the question into the text field. iOS on-device speech, nothing is uploaded.
 - Motion: to detect the shake that reveals the answer.
 - Notifications: optional reminder that asks whether the answer came true. Asked for only after the first saved question.
-- Ads: Google AdMob, a full-screen ad roughly every eighth shake, never on the first shakes and never on top of a rare answer. Ads are non-personalised, so the app does not use App Tracking Transparency and does not track.
+- Ads: Google AdMob, a full-screen ad roughly every fifth shake, never on the first shakes and never on top of a rare answer. Ads are non-personalised, so the app does not use App Tracking Transparency and does not track.
 - In-app purchase: "Remove ads", one-time, non-consumable. It is in Settings (the gear in the top right corner). Restore purchase is right under it.
 
 The app is a toy fortune ball. It makes no claim of real prediction and says so in the description.
@@ -233,8 +233,8 @@ The app is a toy fortune ball. It makes no claim of real prediction and says so 
    покупателей меньше.
 
 **Как реклама ведёт себя в приложении** (`src/ads.ts`, там же все числа):
-первая — не раньше 12-й тряски, дальше каждая 8-я (12, 20, 28…), не чаще одного раза
-в 90 секунд, не в первые 45 секунд после запуска, никогда поверх золотого или космического
+первая — не раньше 5-й тряски, дальше каждая 5-я (5, 10, 15…), не чаще одного раза
+в 60 секунд, не в первые 45 секунд после запуска, никогда поверх золотого или космического
 ответа и никогда у того, кто купил «Убрать рекламу».
 
 ---
@@ -276,5 +276,5 @@ App Store Connect → приложение → **Features → In-App Purchases �
 4. Загрузить скриншоты из `screenshots/1284x2778/en-captioned/` и `.../ru-captioned/`.
 5. Подписать Paid Applications Agreement.
 6. Новая сборка через Codemagic (в ней и реклама, и покупка) → TestFlight → проверить
-   на телефоне: цена видна, покупка проходит, реклама после 12-й тряски, после покупки
+   на телефоне: цена видна, покупка проходит, реклама после 5-й тряски, после покупки
    рекламы нет → отправить на ревью.

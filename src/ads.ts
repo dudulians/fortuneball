@@ -17,11 +17,12 @@ const INTERSTITIAL_AD_ID = "ca-app-pub-5868480097993711/1994062304";
  * rules below are deliberately strict.
  */
 /** Nobody meets an ad before the app has earned some patience. */
-const FIRST_AD_AT_SHAKE = 12;
-/** Then roughly this often. Goldens land on 15, 40, 90 — no collisions. */
-const EVERY_N_SHAKES = 8;
-/** Never twice inside this window, whatever the counter says. */
-const MIN_GAP_MS = 90_000;
+const FIRST_AD_AT_SHAKE = 5;
+/** Then this often. A shake due a golden answer skips its ad, not the golden. */
+const EVERY_N_SHAKES = 5;
+/** Never twice inside this window, whatever the counter says. Five shakes take
+ *  about a minute with reading, so this trims the fastest hands and no one else. */
+const MIN_GAP_MS = 60_000;
 /** The first shake after opening the app is always instant. */
 const QUIET_AFTER_LAUNCH_MS = 45_000;
 
