@@ -13,6 +13,7 @@ import {
   DAY_MS,
   MAX_SNOOZES,
   addHistoryEntry,
+  autoCheckAllowed,
   clearHistory,
   deleteHistoryEntry,
   dueCheckIns,
@@ -248,8 +249,11 @@ export default function App() {
         if (q) {
           // The same open question asked again folds into its first entry (marked ×N);
           // only the first answer gets the "did it come true?" check.
-          // Rare answers and "ask later" dodges get no check-in.
+          // Rare answers and "ask later" dodges are never checked; of the rest,
+          // one real question a day is chased automatically and the others wait
+          // for the bell, so a busy evening cannot become a week of nagging.
           const checkable = !next.rarity && next.tone !== "neutral";
+          const autoCheck = checkable && autoCheckAllowed(q);
           const { entry, repeated } = recordQuestion({
             question: q,
             answerId: next.id,
@@ -257,7 +261,7 @@ export default function App() {
             tone: next.tone,
             rarity: next.rarity,
             lang: settingsRef.current.lang,
-            checkAt: checkable ? Date.now() + DEFAULT_CHECK_IN_DAYS * DAY_MS : undefined,
+            checkAt: autoCheck ? Date.now() + DEFAULT_CHECK_IN_DAYS * DAY_MS : undefined,
           });
           if (repeated) {
             setLastEntry(entry.checkAt ? entry : null);
@@ -265,7 +269,7 @@ export default function App() {
           } else {
             setLastEntry(checkable ? entry : null);
             setCheckDays(DEFAULT_CHECK_IN_DAYS);
-            if (checkable) void syncRemindersRef.current?.(true);
+            if (autoCheck) void syncRemindersRef.current?.(true);
           }
         } else {
           setLastEntry(null);
@@ -823,7 +827,7 @@ export default function App() {
             {showCheckIn && (
               <button className="share-btn remind-btn" onClick={() => setPickingDays(true)} aria-label={t(lang, "remind")}>
                 {bellIcon}
-                {dayLabel(checkDays)}
+                {lastEntry?.checkAt ? dayLabel(checkDays) : t(lang, "remindShort")}
               </button>
             )}
           </div>

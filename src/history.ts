@@ -182,6 +182,34 @@ export function updateHistoryEntry(id: string, patch: Partial<HistoryEntry>): Hi
 }
 
 /** Questions whose check-in time has come and that have no outcome yet, oldest first. */
+/** Never carry more open questions than a person will actually answer. */
+const MAX_OPEN_CHECKS = 5;
+
+/**
+ * Which questions earn a "did it come true?" by themselves.
+ *
+ * Asking is cheap and constant — a dozen questions in one evening, half of them
+ * "раз", "два", "три" — and a check on every one of them turns a toy into a
+ * chore: a week later they all come due at once and stand between her and the
+ * ball. So the ball keeps score from a sample: the first real question of each
+ * day, and only while the journal is not already full of unanswered ones.
+ *
+ * Everything else is still saved and still shown; it simply is not chased.
+ * Any answer can be given a reminder by hand, from the bell under the ball.
+ */
+export function autoCheckAllowed(question: string, entries = loadHistory(), now = Date.now()): boolean {
+  const q = question.trim();
+  // "раз", "ок", "1" — asked to see the ball move, not to learn anything.
+  if (q.length < 8 || q.split(/\s+/).length < 2) return false;
+
+  const checked = entries.filter((e) => e.kind === "question" && e.checkAt !== undefined);
+  if (checked.filter((e) => !e.outcome).length >= MAX_OPEN_CHECKS) return false;
+
+  const startOfDay = new Date(now);
+  startOfDay.setHours(0, 0, 0, 0);
+  return !checked.some((e) => e.askedAt >= startOfDay.getTime());
+}
+
 export function dueCheckIns(now = Date.now()): HistoryEntry[] {
   return loadHistory()
     .filter((e) => e.kind === "question" && e.checkAt !== undefined && e.checkAt <= now && !e.outcome)

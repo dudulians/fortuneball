@@ -46,6 +46,7 @@ const STRINGS = {
     // check-ins
     checkInLabel: "Check in",
     remind: "Remind me to check",
+    remindShort: "Remind me",
     in1Day: "1 day",
     in3Days: "3 days",
     in1Week: "1 week",
@@ -156,6 +157,7 @@ const STRINGS = {
 
     checkInLabel: "Проверить",
     remind: "Напомнить проверить",
+    remindShort: "Напомнить",
     in1Day: "день",
     in3Days: "3 дня",
     in1Week: "неделя",
