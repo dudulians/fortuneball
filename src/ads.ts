@@ -28,6 +28,8 @@ const QUIET_AFTER_LAUNCH_MS = 45_000;
 
 const launchedAt = Date.now();
 let lastShownAt = 0;
+/** Any attempt, filled or not — a no-fill must not be retried on the same shake. */
+let lastAttemptAt = 0;
 let ready = false;
 let initialised = false;
 let showing = false;
@@ -101,6 +103,7 @@ export function adDue(shakesSoFar: number, goldenDue: boolean): boolean {
   if (goldenDue) return false;
   if (Date.now() - launchedAt < QUIET_AFTER_LAUNCH_MS) return false;
   if (Date.now() - lastShownAt < MIN_GAP_MS) return false;
+  if (Date.now() - lastAttemptAt < 30_000) return false;
   return isAdShake(shakesSoFar + 1);
 }
 
@@ -111,6 +114,7 @@ export function adDue(shakesSoFar: number, goldenDue: boolean): boolean {
  */
 export async function showInterstitial(): Promise<void> {
   if (!isNative() || hasRemovedAds() || showing) return;
+  lastAttemptAt = Date.now();
   if (!ready) {
     // Nothing in hand (offline, no fill, warmed too late): let the shake through.
     return;

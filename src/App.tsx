@@ -288,7 +288,7 @@ export default function App() {
    * jolt by jolt from the sensor and ends only when the hand stops.
    */
   const beginShake = useCallback(
-    (source: "tap" | "motion") => {
+    (source: "tap" | "motion", adAlreadyTried = false) => {
       if (busyRef.current) return false;
       if (modeRef.current === "choose" && optionsRef.current.filter((o) => o.trim()).length < 2) {
         setChooseHint(t(settingsRef.current.lang, "needTwoOptions"));
@@ -303,7 +303,11 @@ export default function App() {
       // The ad, if one is due, goes here: before anything is played or
       // animated, so it never lands on top of an answer being read. The shake
       // then starts by itself the moment the ad is closed.
-      if (adDue(loadStats().shakes, isGoldenDue(loadStats()))) {
+      // `adAlreadyTried` is what keeps this from looping: the shake counter does
+      // not move until the shake actually happens, so without it a due ad that
+      // never appears sends us straight back into this branch, for ever. On the
+      // phone that reads as the app freezing on a shown answer.
+      if (!adAlreadyTried && adDue(loadStats().shakes, isGoldenDue(loadStats()))) {
         busyRef.current = true;
         // Whatever the ad does — shows, fails, or never answers at all — the
         // ball is released after eight seconds. The ball waiting forever on an
@@ -311,7 +315,7 @@ export default function App() {
         const released = new Promise<void>((resolve) => window.setTimeout(resolve, 8000));
         void Promise.race([showInterstitial(), released]).then(() => {
           busyRef.current = false;
-          beginShakeRef.current?.(source);
+          beginShakeRef.current?.(source, true);
         });
         return false;
       }
