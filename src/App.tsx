@@ -305,7 +305,11 @@ export default function App() {
       // then starts by itself the moment the ad is closed.
       if (adDue(loadStats().shakes, isGoldenDue(loadStats()))) {
         busyRef.current = true;
-        void showInterstitial().then(() => {
+        // Whatever the ad does — shows, fails, or never answers at all — the
+        // ball is released after eight seconds. The ball waiting forever on an
+        // ad that never came back is indistinguishable from a frozen app.
+        const released = new Promise<void>((resolve) => window.setTimeout(resolve, 8000));
+        void Promise.race([showInterstitial(), released]).then(() => {
           busyRef.current = false;
           beginShakeRef.current?.(source);
         });
