@@ -1381,6 +1381,30 @@ button {
   transform: scale(0.98);
 }
 
+/* Questions waiting to be checked: a number on the journal button, never a
+   door in front of the ball. */
+.journal-button {
+  position: relative;
+}
+
+.journal-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #0b0b12;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  box-shadow: 0 0 0 2px #0b0b12;
+}
+
 /* ---------- Journal (bottom sheet) ---------- */
 
 .sheet-backdrop {

@@ -32,7 +32,7 @@ import { useExampleRotation } from "./examples";
 import { isGoldenDue, loadStats, recordFoundQuestion, rollAnswer, type Stats } from "./stats";
 import { loadRecentChoices, rememberChoice } from "./choices";
 import { wrapForDie } from "./wrapText";
-import { cancelCheckIn, ensureReminderPermission, onReminderTap, scheduleCheckIn } from "./reminders";
+import { ensureReminderPermission, onReminderTap, syncCheckInReminders } from "./reminders";
 import { accuracy } from "./history";
 import { adDue, showInterstitial, stopAds, warmAds } from "./ads";
 import { refreshPurchases } from "./purchases";
@@ -72,6 +72,8 @@ export default function App() {
   const [entries, setEntries] = useState<HistoryEntry[]>(() => loadHistory());
   const [stats, setStats] = useState<Stats>(() => loadStats());
   const [checkIn, setCheckIn] = useState<HistoryEntry | null>(null);
+  /** Questions past their check date, waiting on the journal button rather than in the way. */
+  const [dueCount, setDueCount] = useState(0);
   const [goldenConfirm, setGoldenConfirm] = useState(false);
   const goldenDecisionRef = useRef<"spend" | "skip" | null>(null);
   const [lastEntry, setLastEntry] = useState<HistoryEntry | null>(null);
@@ -160,15 +162,28 @@ export default function App() {
   useEffect(() => () => timersRef.current.forEach(clearTimeout), []);
 
   const refreshEntries = useCallback(() => setEntries(loadHistory()), []);
+  const syncRemindersRef = useRef<((ask: boolean) => Promise<void>) | null>(null);
 
-  /** Schedules (or re-schedules) the "did it come true?" reminder for a question. */
-  const armReminder = useCallback(async (entry: HistoryEntry) => {
-    if (!settingsRef.current.reminders || !entry.checkAt) return;
-    const ok = await ensureReminderPermission();
-    if (!ok) return;
-    const id = await scheduleCheckIn(entry, settingsRef.current.lang);
-    if (id) updateHistoryEntry(entry.id, { notificationId: id });
+  /**
+   * Rebuilds the notification schedule from the journal. Every question that is
+   * waiting shares an evening with the others due that day, and that evening
+   * gets one notification — a week of ordinary use used to arrive as a burst of
+   * separate alerts.
+   */
+  const syncReminders = useCallback(async (askPermission: boolean) => {
+    const on = settingsRef.current.reminders;
+    if (on && askPermission) {
+      const ok = await ensureReminderPermission();
+      if (!ok) return;
+    }
+    await syncCheckInReminders(loadHistory(), settingsRef.current.lang, on);
   }, []);
+  syncRemindersRef.current = syncReminders;
+
+  // Switching reminders off in Settings must clear what is already scheduled.
+  useEffect(() => {
+    void syncCheckInReminders(loadHistory(), settings.lang, settings.reminders);
+  }, [settings.reminders, settings.lang]);
 
   /** The shake is over (hand stopped, or the tap-driven rattle ran out): the die surfaces. */
   const finishShake = useCallback(() => {
@@ -250,7 +265,7 @@ export default function App() {
           } else {
             setLastEntry(checkable ? entry : null);
             setCheckDays(DEFAULT_CHECK_IN_DAYS);
-            if (checkable) void armReminder(entry);
+            if (checkable) void syncRemindersRef.current?.(true);
           }
         } else {
           setLastEntry(null);
@@ -262,7 +277,7 @@ export default function App() {
         busyRef.current = false;
       }, COOLDOWN_MS);
     }, RISE_MS);
-  }, [later, armReminder, refreshEntries]);
+  }, [later, refreshEntries]);
 
   /**
    * Start a shake. A tap plays a fixed rattle; a real shake ("motion") is driven
@@ -398,15 +413,14 @@ export default function App() {
     };
   }, []);
 
-  // "Did it come true?" — when a reminder is tapped, and whenever a check-in is due on open/return.
+  // "Did it come true?" — a tapped reminder opens its card; everything else
+  // waits quietly behind a number on the journal button. Opening the app used
+  // to mean clearing the whole queue before the ball could be shaken again.
   useEffect(() => {
-    const showDue = () => {
-      const due = dueCheckIns();
-      if (due.length) setCheckIn(due[0]);
-    };
-    showDue();
+    const countDue = () => setDueCount(dueCheckIns().length);
+    countDue();
     const onVisible = () => {
-      if (!document.hidden) showDue();
+      if (!document.hidden) countDue();
     };
     document.addEventListener("visibilitychange", onVisible);
     const stopTap = onReminderTap((entryId) => {
@@ -510,7 +524,7 @@ export default function App() {
     if (!updated) return;
     setLastEntry(updated);
     refreshEntries();
-    await armReminder(updated);
+    await syncReminders(true);
   };
 
   const resolveEntry = async (entry: HistoryEntry, outcome: "yes" | "no" | "later") => {
@@ -518,26 +532,25 @@ export default function App() {
       const snoozes = (entry.snoozes ?? 0) + 1;
       if (snoozes >= MAX_SNOOZES) {
         updateHistoryEntry(entry.id, { outcome: "unknown", snoozes });
-        await cancelCheckIn(entry.notificationId);
       } else {
-        const updated = updateHistoryEntry(entry.id, { snoozes, checkAt: Date.now() + 7 * DAY_MS });
-        if (updated) await armReminder(updated);
+        updateHistoryEntry(entry.id, { snoozes, checkAt: Date.now() + 7 * DAY_MS });
       }
     } else {
       updateHistoryEntry(entry.id, { outcome });
-      await cancelCheckIn(entry.notificationId);
     }
     refreshEntries();
-    const due = dueCheckIns().filter((e) => e.id !== entry.id);
-    setCheckIn(due[0] ?? null);
+    setDueCount(dueCheckIns().length);
+    setCheckIn(null);
+    void syncReminders(false);
   };
 
   const deleteEntry = async (entry: HistoryEntry) => {
-    const removed = deleteHistoryEntry(entry.id);
-    if (removed?.notificationId) await cancelCheckIn(removed.notificationId);
+    deleteHistoryEntry(entry.id);
     if (lastEntry?.id === entry.id) setLastEntry(null);
     if (checkIn?.id === entry.id) setCheckIn(null);
     refreshEntries();
+    setDueCount(dueCheckIns().length);
+    await syncReminders(false);
   };
 
   const deleteEntries = async (list: HistoryEntry[]) => {
@@ -545,11 +558,12 @@ export default function App() {
   };
 
   const clearAllEntries = async () => {
-    const removed = clearHistory();
-    for (const e of removed) if (e.notificationId) await cancelCheckIn(e.notificationId);
+    clearHistory();
     setLastEntry(null);
     setCheckIn(null);
+    setDueCount(0);
     refreshEntries();
+    await syncReminders(false);
   };
 
   // Examples stay visible with a question in the field: tapping one replaces the question
@@ -608,8 +622,9 @@ export default function App() {
             setJournalTab("answers");
             setJournalOpen(true);
           }}
-          aria-label={t(lang, "journal")}
+          aria-label={dueCount ? `${t(lang, "journal")}: ${dueCount} ${t(lang, "checksWaiting")}` : t(lang, "journal")}
         >
+          {dueCount > 0 && <span className="journal-badge" aria-hidden>{dueCount > 9 ? "9+" : dueCount}</span>}
           <svg viewBox="0 0 24 24" aria-hidden>
             <path
               fill="none"

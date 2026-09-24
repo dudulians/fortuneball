@@ -51,6 +51,9 @@ const STRINGS = {
     in1Week: "1 week",
     in1Month: "1 month",
     checkInTitle: "Did it come true?",
+    /** %n is the count. Phrased to avoid number agreement in either language. */
+    questionsWaiting: "%n questions are waiting — did they come true?",
+    checksWaiting: "waiting to be checked",
     youAsked: "You asked:",
     ballSaid: "The ball said:",
     outcomeYes: "Yes",
@@ -158,6 +161,8 @@ const STRINGS = {
     in1Week: "неделя",
     in1Month: "месяц",
     checkInTitle: "Сбылось?",
+    questionsWaiting: "Вопросов на проверку: %n. Сбылись?",
+    checksWaiting: "ждут проверки",
     youAsked: "Ты спрашивала:",
     ballSaid: "Шар сказал:",
     outcomeYes: "Да",
