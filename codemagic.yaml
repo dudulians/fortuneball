@@ -10,10 +10,10 @@
 #   App settings → environment → integrations → enable "App Store Connect"
 #   with the integration alias `codemagic` (matches `auth: integration`).
 #
-# Never run this workflow at the same time as a MeMap build: both pipelines
-# revoke and re-create the team's distribution certificate, so two builds
-# racing each other will make one of them fail at "Set up code signing".
-# Just start it again.
+# Signing uses the team's single distribution certificate through the
+# CERTIFICATE_PRIVATE_KEY secret, so this workflow no longer fights MeMap over
+# certificates. MeMap still creates one per build, so until it is moved to the
+# same key, a MeMap build can still fill the account's three slots.
 
 workflows:
   ios-testflight:
@@ -34,6 +34,12 @@ workflows:
         XCODE_SCHEME: "App"
         BUNDLE_ID: "com.uliana.fortuneball"
         APPLE_TEAM_ID: "X4QQRGJ6C4"
+      groups:
+        # Carries CERTIFICATE_PRIVATE_KEY, the private key of the one
+        # distribution certificate this account signs everything with. Without
+        # this line the variable never reaches the machine and the build stops
+        # in "Set up code signing".
+        - code-signing
       node: 22.11.0
       xcode: latest
       cocoapods: default
@@ -85,36 +91,32 @@ workflows:
           echo "==> Initialize keychain"
           keychain initialize
 
-          echo "==> Revoke stale distribution certificates"
-          # Apple allows 2 active distribution certificates per team. Every
-          # build generates a fresh private key, so certificates from earlier
-          # builds (of this app or of MeMap) are useless here — revoke them,
-          # otherwise the API answers 409 and the build dies. Revoking does
-          # not affect builds already uploaded to TestFlight or the store.
-          for FILTER_TYPE in DISTRIBUTION IOS_DISTRIBUTION; do
-            echo "    listing certs of type $FILTER_TYPE"
-            RAW=$(app-store-connect certificates list --type "$FILTER_TYPE" --json 2>/dev/null || echo "[]")
-            IDS=$(echo "$RAW" | python3 -c "import json,sys; d=json.loads(sys.stdin.read() or '[]'); items = d if isinstance(d, list) else d.get('data', []); print(' '.join(c.get('id','') for c in items if c))" 2>/dev/null || echo "")
-            if [ -n "$IDS" ]; then
-              for cert_id in $IDS; do
-                echo "    revoke $cert_id"
-                app-store-connect certificates revoke "$cert_id" || true
-              done
-            else
-              echo "    none found for $FILTER_TYPE"
-            fi
-          done
+          # Apple allows three active distribution certificates per account, and
+          # this step used to spend one on every build: it generated a throwaway
+          # private key with `openssl genrsa`, so Apple had no choice but to
+          # issue a new certificate to match it. Three builds and the account was
+          # full — 409, "You already have a current Distribution certificate".
+          # (The cleanup loop above it never worked: codemagic-cli-tools has no
+          # `certificates revoke` verb, and `|| true` swallowed the error every
+          # time. Fixing that would have been worse — deleting the team's
+          # certificates breaks the profiles of the other two apps.)
+          #
+          # Instead all three apps now sign with one certificate whose private
+          # key lives in the CERTIFICATE_PRIVATE_KEY secret. Given the key,
+          # --create finds that certificate and issues nothing. Atlas has run
+          # this way since 16.09.2026: eleven builds, no new certificates.
+          if [ -z "$CERTIFICATE_PRIVATE_KEY" ]; then
+            echo "CERTIFICATE_PRIVATE_KEY is empty — add it to the code-signing group"
+            echo "in Codemagic (Secure). Stopping here rather than minting another"
+            echo "certificate and filling the account."
+            exit 1
+          fi
+          printf '%s' "$CERTIFICATE_PRIVATE_KEY" > /tmp/cert_private_key.pem
 
-          echo "==> Generate private key for the new distribution cert"
-          openssl genrsa -out /tmp/cert_private_key.pem 2048
+          echo "==> Fetch signing files (reuses the team certificate, creates the profile)"
+          app-store-connect fetch-signing-files "$BUNDLE_ID"             --type IOS_APP_STORE             --certificate-key=@file:/tmp/cert_private_key.pem             --create
 
-          echo "==> Fetch signing files (creates cert + profile, registers the bundle id if missing)"
-          app-store-connect fetch-signing-files "$BUNDLE_ID" \
-            --type IOS_APP_STORE \
-            --certificate-key=@file:/tmp/cert_private_key.pem \
-            --create
-
-          echo "==> Add downloaded cert to keychain"
+          echo "==> Add certificate to keychain"
           keychain add-certificates
 
           echo "==> Patch Xcode project to use the fetched profile"
