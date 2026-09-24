@@ -197,14 +197,19 @@ The app is a toy fortune ball. It makes no claim of real prediction and says so 
 
 **Вопрос «Do you or your third-party partners collect data from this app?» → Yes.**
 
-| Категория Apple | Что отмечать | Purposes | Linked to identity | Used for tracking |
-|---|---|---|---|---|
-| Identifiers → Device ID | Да | Third-Party Advertising | Нет | **Нет** |
-| Usage Data → Product Interaction | Да | Third-Party Advertising, Analytics | Нет | **Нет** |
-| Diagnostics → Crash Data | Да | App Functionality | Нет | Нет |
-| Diagnostics → Performance Data | Да | App Functionality | Нет | Нет |
-| Location → Coarse Location | Да | Third-Party Advertising | Нет | **Нет** |
-| Всё остальное (контакты, фото, здоровье, покупки, поиск, контент) | Не отмечать | | | |
+| Раздел → тип данных в анкете | Purposes | Linked to identity | Used for tracking |
+|---|---|---|---|
+| Identifiers → **Device ID** | Third-Party Advertising | No | **No** |
+| Usage Data → **Product Interaction** | Analytics, Third-Party Advertising | No | **No** |
+| Usage Data → **Advertising Data** | Third-Party Advertising | No | **No** |
+| Diagnostics → **Crash Data** | App Functionality | No | No |
+| Diagnostics → **Performance Data** | App Functionality | No | No |
+| Diagnostics → **Other Diagnostic Data** | App Functionality | No | No |
+| Location → **Coarse Location** | Third-Party Advertising | No | **No** |
+
+Всё остальное — контакты, фото, аудио, поиск, история просмотров, User ID, Purchases,
+финансы, здоровье — **не отмечать**. Покупку проводит Apple, приложение платёжных данных
+не видит; вопросы и журнал не покидают телефон, а значит по определению Apple не «собираются».
 
 Почему везде «Used for tracking — No»: приложение запрашивает **неперсонализированную**
 рекламу (`npa: true` в `src/ads.ts`), не показывает окно App Tracking Transparency и не имеет
