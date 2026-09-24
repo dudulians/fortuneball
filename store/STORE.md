@@ -249,11 +249,12 @@ App Store Connect → приложение → **Features → In-App Purchases �
 | Reference Name | Remove ads |
 | Product ID | `com.uliana.fortuneball.noads` — **ровно так**, id зашит в коде |
 | Price | Tier 3 (~$2.99) |
-| Display Name (EN) | `Remove ads` |
-| Description (EN) | `Turns off the ads for good. The ball stays exactly as it is.` |
+| Display Name (EN) | `Remove ads` — **до 35 знаков** |
+| Description (EN) | `Turns the ads off for good. Nothing else changes.` — **до 55 знаков** |
 | Display Name (RU) | `Убрать рекламу` |
-| Description (RU) | `Выключает рекламу навсегда. Сам шар остаётся прежним.` |
+| Description (RU) | `Выключает рекламу навсегда. Шар остаётся прежним.` |
 | Review Screenshot | `store/iap-review-screenshot.png` (экран настроек с ценой) |
+| Цена | вводится **внутри товара**: Price Schedule → Add Pricing. Там же Availability → все страны. Пока эти блоки пустые, товар незакончен и App Store не отдаёт его приложению — в настройках будет прочерк. |
 | Review Notes | `Settings (gear, top right) → "Remove ads". Restore purchase is under it.` |
 
 Покупку нужно отправить на ревью **вместе с первой сборкой** — иначе она останется
