@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>Fortune Ball</string>
+        <string>Shake to Decide</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -43,7 +43,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Fortune Ball listens to your question when you tap the microphone.</string>
+	<string>Shake to Decide listens to your question when you tap the microphone.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Your spoken question is turned into text so the ball can answer it.</string>
 	<key>NSMotionUsageDescription</key>

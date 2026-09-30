@@ -2,7 +2,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.uliana.fortuneball",
-  appName: "Fortune Ball",
+  appName: "Shake to Decide",
   webDir: "dist",
   ios: {
     backgroundColor: "#12122a",

@@ -2,8 +2,8 @@ import type { Lang } from "./answers";
 
 const STRINGS = {
   en: {
-    appName: "Fortune Ball",
-    tagline: "Your pocket oracle.",
+    appName: "Shake to Decide",
+    tagline: "Two options. One shake.",
     questionPlaceholder: "Ask a yes-or-no question…",
     hintIdle: "Type a question below and shake the phone",
     hintChoose: "Enter your options and shake",
@@ -26,11 +26,11 @@ const STRINGS = {
     reminders: "Reminders",
     language: "Language",
     done: "Done",
-    introStep1: "Think of a yes-or-no question.",
+    introStep1: "Type two options — or a yes-or-no question.",
     introStep2: "Shake the phone — or tap the ball.",
-    introStep3: "Read the answer in the blue window.",
+    introStep3: "The ball decides. A week later it asks how it went.",
     start: "Start",
-    shareFooter: "FORTUNE BALL",
+    shareFooter: "SHAKE TO DECIDE",
     shareTagline: "shake yours",
     shareError: "Couldn't share right now.",
 
@@ -115,8 +115,8 @@ const STRINGS = {
     purchaseFailed: "The purchase didn't go through.",
   },
   ru: {
-    appName: "Fortune Ball",
-    tagline: "Оракул в кармане.",
+    appName: "Shake to Decide",
+    tagline: "Два варианта. Одна тряска.",
     questionPlaceholder: "Задай вопрос: да или нет…",
     hintIdle: "Впиши вопрос ниже и встряхни телефон",
     hintChoose: "Впиши варианты и встряхни",
@@ -139,11 +139,11 @@ const STRINGS = {
     reminders: "Напоминания",
     language: "Язык",
     done: "Готово",
-    introStep1: "Задумай вопрос, на который можно ответить да или нет.",
+    introStep1: "Впиши два варианта — или вопрос «да или нет».",
     introStep2: "Встряхни телефон или коснись шара.",
-    introStep3: "Ответ всплывёт в синем окошке.",
+    introStep3: "Шар решит. Через неделю спросит, как вышло.",
     start: "Начать",
-    shareFooter: "FORTUNE BALL",
+    shareFooter: "SHAKE TO DECIDE",
     shareTagline: "встряхни свой",
     shareError: "Не получилось поделиться.",
 

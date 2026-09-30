@@ -125,8 +125,15 @@ button {
   font-family: var(--font);
   font-size: var(--fs-caption);
   font-weight: 700;
-  letter-spacing: 0.32em;
-  text-indent: 0.32em;
+  /* "SHAKE TO DECIDE" is three letters longer than the old name and at 0.32em
+     it reached the journal button on a 375 px phone. The tracking is trimmed,
+     and the width is capped so no name can ever collide with the two buttons. */
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  max-width: calc(100% - 104px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--ink-40);
   text-transform: uppercase;
 }
