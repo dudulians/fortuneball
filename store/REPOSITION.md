@@ -151,31 +151,49 @@ Entertainment — та самая полка, где Apple видит переи
 - Журнал называется **«Решения»**, заголовок статистики — «Твои решения».
 - Карточка для шеринга теперь говорит «Мои решения сбылись в 73% случаев».
 
-## 9. Письмо в Resolution Center
+## 9. Что на самом деле написано в правиле 4.3(b)
+
+Прочитано на developer.apple.com 30.09.2026, чтобы строить ответ на тексте правила,
+а не на догадках.
+
+- Правило прямо перечисляет насыщенные категории, и **гадальные приложения там названы**
+  вместе со знакомствами, фонариками, обоями, звуками и простыми таймерами. То есть отнести
+  шар к этой полке — не ошибка ревьюера, а применение правила по букве.
+- Планка для новых приложений в такой категории сформулирована как «meaningfully different
+  or improved experience» (Apple, App Review Guidelines 4.3(b)) — заметно иной или лучший
+  опыт.
+- Там же: повторные отправки низкокачественных приложений могут кончиться исключением
+  из Apple Developer Program.
+
+**Вывод для письма.** Не спорить с категорией и не просить исключения. Показывать, чем
+опыт заметно иной: приложение **проверяет собственные ответы** и ведёт счёт сбывшегося —
+ровно того, чего гадальные приложения не делают, потому что предсказание им нужно забыть.
+
+## 10. Письмо в Resolution Center
 
 Отправляется вместе с новой подачей. Английский — язык переписки с ревью.
 
 ```
 Hello,
 
-Thank you for the review. We have changed both the app and how it is presented, and we would like to explain why we believe this app does not belong to the category described in the 4.3(b) decision.
+Thank you for the review. We understand that 4.3(b) names fortune telling among the saturated categories, and we are not asking for an exception. We would like to show why we believe this app offers a meaningfully different experience, and what we changed after your feedback.
 
-The app contains no astrology, no horoscopes, no zodiac signs, no palm reading and no tarot. None of the content listed in the rejection is present anywhere in it.
+What makes it different:
 
-What the app actually does:
+1. It is a decision tool first. You enter two to four options, shake, and one of them is chosen. This is the mode the app opens in for a new user.
 
-1. It helps you decide between options. You enter two to four alternatives, shake, and one of them is chosen. This is now the mode the app opens in for a new user.
+2. It checks its own answers. Every decision you write down is saved, and a week later the app asks whether it actually worked out: yes, no, or not yet. The "Decisions" screen shows the share of decisions that came true as a running percentage. A fortune-telling app gives a prediction and forgets it. The point of this one is that it follows up on every answer it gives, and the resulting number belongs to the person, not to the ball.
 
-2. It keeps a record of those decisions and checks them. Every decision you write down is saved, and a week later the app asks whether it actually worked out. The "Decisions" screen shows the share of your decisions that came true as a running percentage. A fortune-telling app gives a prediction and forgets it; this one follows up on every one of them, which is the point of the product.
+3. It is built rather than assembled. The liquid inside the window is rendered in real time with WebGL, the die has its own physics and settles differently every time, and answers are delivered through Core Haptics. There is no pre-rendered video and no wrapped web page.
 
-3. The ball is the interface, not the content. The liquid is computed in real time with WebGL, the die has its own physics, and answers are delivered with Core Haptics feedback. Nothing here is pre-rendered video or a wrapped web page.
+The app also contains none of the content described in the decision: no astrology, no horoscopes, no zodiac signs, no palm reading and no tarot.
 
-Following your feedback we have also:
-- made the decision mode the default on first launch;
-- renamed the history screen to "Decisions" and put the outcome statistics first;
-- rewritten the subtitle, keywords, description and screenshots so they describe a decision tool rather than a fortune-telling app;
-- changed the primary category to Utilities;
-- fixed the 2.1(b) issue: the "Remove ads" in-app purchase now has an App Review screenshot and is submitted together with this version.
+What we changed after your feedback:
+- the app now opens in the decision mode instead of the yes/no ball;
+- the history screen is now "Decisions" and leads with the outcome statistics;
+- the app has been renamed "Shake to Decide";
+- the subtitle, keywords, description and screenshots now describe a decision tool, and the primary category is Utilities;
+- the 2.1(b) issue is fixed: the "Remove ads" in-app purchase now has an App Review screenshot and is submitted together with this version.
 
-We would be grateful if you could take another look.
+Thank you for taking another look.
 ```
