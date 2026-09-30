@@ -120,7 +120,8 @@ const stats = {
   found: { g01: now - 21 * DAY, g05: now - 12 * DAY, g07: now - 6 * DAY, c01: now - 3 * DAY },
   foundQuestion: DATA.found,
 };
-const settings = { sound: true, haptics: true, reminders: true, lang: LANG, hasSeenIntro: true };
+// mode is pinned per shot below; the app itself now opens newcomers in "choose"
+const settings = { sound: true, haptics: true, reminders: true, lang: LANG, hasSeenIntro: true, mode: "yesno" };
 
 const browser = await chromium.launch({
   executablePath: CHROME,

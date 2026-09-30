@@ -27,19 +27,21 @@ const CHROME = process.env.CHROME ?? "C:/Program Files/Google/Chrome/Application
 
 mkdirSync(OUT, { recursive: true });
 
-// Store order: the answer first, then the reason to come back, then the rest.
+// Store order: what the app is for first — choosing, and the record it keeps —
+// then the ball itself. The first screenshot is the one shown in search results,
+// and it decides whether this reads as a decision tool or as one more oracle.
 const CAPTIONS = {
   en: [
-    { src: "01-answer.png", out: "1-answer.png", text: "Ask anything.\nShake for an answer." },
-    { src: "04-journal.png", out: "2-journal.png", text: "It remembers —\nand keeps score." },
-    { src: "03-choose.png", out: "3-choose.png", text: "Can’t decide?\nLet the ball pick." },
+    { src: "03-choose.png", out: "1-choose.png", text: "Two options.\nOne shake. Decided." },
+    { src: "04-journal.png", out: "2-decisions.png", text: "Every decision,\nchecked a week later." },
+    { src: "01-answer.png", out: "3-answer.png", text: "Or just ask\nyes or no." },
     { src: "02-golden.png", out: "4-golden.png", text: "Rare golden answers\nworth shaking for." },
     { src: "05-collection.png", out: "5-collection.png", text: "15 rare answers\nto find." },
   ],
   ru: [
-    { src: "01-answer.png", out: "1-answer.png", text: "Спроси и встряхни.\nШар ответит." },
-    { src: "04-journal.png", out: "2-journal.png", text: "Шар помнит вопрос\nи считает попадания." },
-    { src: "03-choose.png", out: "3-choose.png", text: "Не можешь выбрать?\nПусть решит шар." },
+    { src: "03-choose.png", out: "1-choose.png", text: "Два варианта.\nОдна тряска. Решено." },
+    { src: "04-journal.png", out: "2-decisions.png", text: "Каждое решение\nпроверяется через неделю." },
+    { src: "01-answer.png", out: "3-answer.png", text: "Или просто спроси:\nда или нет." },
     { src: "02-golden.png", out: "4-golden.png", text: "Редкие золотые ответы —\nради них и трясут." },
     { src: "05-collection.png", out: "5-collection.png", text: "15 редких ответов,\nкоторые надо найти." },
   ],

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Lang } from "./answers";
+
+/** Yes/No is the ball people know; Choose is what the app is actually for. */
+export type Mode = "yesno" | "choose";
 import { detectLang } from "./i18n";
 
 export interface Settings {
@@ -9,6 +12,12 @@ export interface Settings {
   reminders: boolean;
   lang: Lang;
   hasSeenIntro: boolean;
+  /**
+   * Which side of the switch the app opens on. New people land in "choose":
+   * the first thing the app should say about itself is that it helps decide
+   * between two things, not that it tells fortunes.
+   */
+  mode: Mode;
 }
 
 const STORAGE_KEY = "fortuneball.settings.v2";
@@ -21,6 +30,7 @@ function defaults(): Settings {
     reminders: true,
     lang: detectLang(),
     hasSeenIntro: false,
+    mode: "choose",
   };
 }
 
@@ -31,7 +41,8 @@ function load(): Settings {
     if (!raw) return base;
     const parsed = JSON.parse(raw) as Partial<Settings>;
     const lang: Lang = parsed.lang === "ru" || parsed.lang === "en" ? parsed.lang : base.lang;
-    return { ...base, ...parsed, lang };
+    const mode: Mode = parsed.mode === "yesno" || parsed.mode === "choose" ? parsed.mode : base.mode;
+    return { ...base, ...parsed, lang, mode };
   } catch {
     return base;
   }

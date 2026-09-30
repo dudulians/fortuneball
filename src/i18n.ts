@@ -62,10 +62,10 @@ const STRINGS = {
     outcomeLater: "Not yet",
 
     // journal
-    journal: "Journal",
-    tabAnswers: "Answers",
+    journal: "Decisions",
+    tabAnswers: "Decisions",
     tabCollection: "Collection",
-    accuracyTitle: "Ball accuracy",
+    accuracyTitle: "Your decisions",
     accuracyNone: "Nothing checked yet",
     accuracyCameTrue: "came true",
     of: "of",
@@ -103,7 +103,7 @@ const STRINGS = {
     golden: "Golden",
     cosmic: "Cosmic",
     rareFound: "A rare answer for your collection",
-    shareAccuracyTitle: "My Fortune Ball is right",
+    shareAccuracyTitle: "My decisions came true",
     shareAccuracyOfTime: "of the time",
 
     // remove ads
@@ -171,10 +171,10 @@ const STRINGS = {
     outcomeNo: "Нет",
     outcomeLater: "Пока нет",
 
-    journal: "Журнал",
-    tabAnswers: "Ответы",
+    journal: "Решения",
+    tabAnswers: "Решения",
     tabCollection: "Коллекция",
-    accuracyTitle: "Точность шара",
+    accuracyTitle: "Твои решения",
     accuracyNone: "Пока ничего не проверено",
     accuracyCameTrue: "сбылись",
     of: "из",
@@ -212,7 +212,7 @@ const STRINGS = {
     golden: "Золотой",
     cosmic: "Космический",
     rareFound: "Редкий ответ в твою коллекцию",
-    shareAccuracyTitle: "Мой Fortune Ball угадывает в",
+    shareAccuracyTitle: "Мои решения сбылись в",
     shareAccuracyOfTime: "случаев",
 
     // убрать рекламу

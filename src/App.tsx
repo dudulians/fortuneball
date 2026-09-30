@@ -7,7 +7,7 @@ import JournalSheet from "./JournalSheet";
 import CheckInCard from "./CheckInCard";
 import ChooseInputs from "./ChooseInputs";
 import Sparkles from "./Sparkles";
-import { useSettings } from "./settings";
+import { useSettings, type Mode } from "./settings";
 import { t } from "./i18n";
 import {
   DAY_MS,
@@ -49,8 +49,6 @@ const MAX_QUESTION = 120;
 const CHECK_IN_DAYS = [1, 3, 7, 30] as const;
 const DEFAULT_CHECK_IN_DAYS = 7;
 
-type Mode = "yesno" | "choose";
-
 /** Read once, before the first render: what the page was showing if it just restarted. */
 const RESTORED = restoreLastAnswer();
 
@@ -63,7 +61,8 @@ export default function App() {
   const [question, setQuestion] = useState(RESTORED?.question ?? "");
   /** The question the current answer was given to (the field may have been edited since). */
   const [askedQuestion, setAskedQuestion] = useState(RESTORED?.question ?? "");
-  const [mode, setMode] = useState<Mode>("yesno");
+  const mode = settings.mode;
+  const setMode = useCallback((m: Mode) => updateSettings({ mode: m }), [updateSettings]);
   const [options, setOptions] = useState<string[]>(["", ""]);
   const [recent, setRecent] = useState<string[][]>(() => loadRecentChoices());
   const [chooseHint, setChooseHint] = useState<string | null>(null);
