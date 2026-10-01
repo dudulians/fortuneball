@@ -112,6 +112,41 @@ export default function SettingsModal({ open, settings, onChange, onClose, onAds
           />
         </label>
 
+        <h3 className="editor-section">{t(lang, "accessibility")}</h3>
+
+        <div className="row">
+          <span>{t(lang, "textSize")}</span>
+          <div className="segmented" role="radiogroup" aria-label={t(lang, "textSize")}>
+            {([
+              [1, "textSizeNormal"],
+              [1.15, "textSizeLarge"],
+              [1.3, "textSizeLargest"],
+            ] as const).map(([scale, key]) => (
+              <button
+                key={scale}
+                type="button"
+                role="radio"
+                aria-checked={settings.textScale === scale}
+                aria-label={t(lang, key)}
+                className={settings.textScale === scale ? "active" : ""}
+                onClick={() => onChange({ textScale: scale })}
+              >
+                {scale === 1 ? "A" : scale === 1.15 ? "A+" : "A++"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <label className="row">
+          <span>{t(lang, "highContrast")}</span>
+          <input
+            type="checkbox"
+            className="toggle"
+            checked={settings.highContrast}
+            onChange={(e) => onChange({ highContrast: e.target.checked })}
+          />
+        </label>
+
         <div className="row">
           <span>{t(lang, "language")}</span>
           <div className="segmented" role="radiogroup" aria-label={t(lang, "language")}>

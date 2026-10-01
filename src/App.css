@@ -18,9 +18,10 @@
 
   /* Three type sizes for the whole app: captions, text (the question field included), one
      display number. The field no longer has its own size — it kept reading as "too big". */
-  --fs-caption: 12px;
-  --fs-body: 15px;
-  --fs-display: 56px;
+  --fs-scale: 1;
+  --fs-caption: calc(12px * var(--fs-scale));
+  --fs-body: calc(15px * var(--fs-scale));
+  --fs-display: calc(56px * var(--fs-scale));
 
   --ink: #f1eee8;
   --ink-60: rgba(241, 238, 232, 0.6);
@@ -28,6 +29,37 @@
   --ink-25: rgba(241, 238, 232, 0.25);
   --line: rgba(241, 238, 232, 0.14);
   --accent: #6f80ff;
+}
+
+/* Every muted tone in the app is one of these four. Lifting them here lifts
+   the whole interface at once, without touching a single component. */
+:root[data-contrast="high"] {
+  --ink-60: rgba(241, 238, 232, 0.92);
+  --ink-40: rgba(241, 238, 232, 0.8);
+  --ink-25: rgba(241, 238, 232, 0.6);
+  --line: rgba(241, 238, 232, 0.4);
+}
+
+/* Shown to screen readers only: the answer lives inside a canvas, where
+   VoiceOver cannot reach it, so it is mirrored here as text. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Keyboard and switch-control users need to see where they are. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 10px;
 }
 
 html,
@@ -2305,13 +2337,23 @@ button {
   }
 }
 
+/* The system asked for less movement. The ball still reveals its answer —
+   that is the point of the app — but it stops wobbling in the hand, drifting
+   with the tilt, and throwing sparks on the way. */
 @media (prefers-reduced-motion: reduce) {
   .caustic,
   .die-inner.wobbling,
   .mic-btn.listening::after,
   .example-chip,
   .hint,
-  .sparkle {
+  .sparkle,
+  .bubble {
     animation: none;
+  }
+
+  .ball-wobble,
+  .ball-tilt {
+    transform: none !important;
+    transition: none !important;
   }
 }

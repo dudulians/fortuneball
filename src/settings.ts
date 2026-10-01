@@ -12,6 +12,10 @@ export interface Settings {
   reminders: boolean;
   lang: Lang;
   hasSeenIntro: boolean;
+  /** Type scale: 1 is the drawn size, up to 1.3 for eyes that need it. */
+  textScale: number;
+  /** Lifts the muted greys to full strength for anyone who loses them. */
+  highContrast: boolean;
   /**
    * Which side of the switch the app opens on. New people land in "choose":
    * the first thing the app should say about itself is that it helps decide
@@ -31,6 +35,8 @@ function defaults(): Settings {
     lang: detectLang(),
     hasSeenIntro: false,
     mode: "choose",
+    textScale: 1,
+    highContrast: false,
   };
 }
 
@@ -42,7 +48,10 @@ function load(): Settings {
     const parsed = JSON.parse(raw) as Partial<Settings>;
     const lang: Lang = parsed.lang === "ru" || parsed.lang === "en" ? parsed.lang : base.lang;
     const mode: Mode = parsed.mode === "yesno" || parsed.mode === "choose" ? parsed.mode : base.mode;
-    return { ...base, ...parsed, lang, mode };
+    const textScale = typeof parsed.textScale === "number" && parsed.textScale >= 1 && parsed.textScale <= 1.3
+      ? parsed.textScale
+      : base.textScale;
+    return { ...base, ...parsed, lang, mode, textScale };
   } catch {
     return base;
   }

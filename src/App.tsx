@@ -129,6 +129,15 @@ export default function App() {
     document.documentElement.lang = lang;
   }, [lang]);
 
+  // Accessibility settings live on the root element: one place, and every
+  // component inherits them through the four muted tones and the type scale.
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--fs-scale", String(settings.textScale));
+    if (settings.highContrast) root.setAttribute("data-contrast", "high");
+    else root.removeAttribute("data-contrast");
+  }, [settings.textScale, settings.highContrast]);
+
   // Dev-only console hook: window.__fortune.setAnswer("p05") / setLang("ru") / forceSpecial("g01")
   useEffect(() => {
     if (!import.meta.env.DEV) return;
@@ -688,7 +697,12 @@ export default function App() {
       <div className={`stage phase-${phase}`} ref={sceneRef} style={{ "--glow": glow } as React.CSSProperties}>
         <div className="ball-glow" />
         <div className="ball-shadow" />
-        <button className="ball" onClick={onBallTap} aria-label={t(lang, "shakeAria")}>
+        <button
+          className="ball"
+          onClick={onBallTap}
+          aria-label={phase === "shown" ? t(lang, "shakeAgainAria") : t(lang, "shakeAria")}
+          aria-busy={phase === "shaking" || phase === "rising"}
+        >
           <Ball ref={wobbleRef} phase={phase} answer={answer} lang={lang} bubbleSeed={bubbleSeed} hue={customBall.enabled ? customBall.hue : undefined} faces={customFaces} />
         </button>
         {answer?.rarity && phase === "shown" && sparkleSeed > 0 && <Sparkles seed={sparkleSeed} kind={answer.rarity} />}
@@ -854,6 +868,17 @@ export default function App() {
         {shareFailed && <p className="share-error">{t(lang, "shareError")}</p>}
       </div>
       </div>
+
+      {/* The answer as text, for screen readers only — it is painted into a
+          canvas, so without this a blind person shakes the ball and is told
+          nothing at all. */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {phase === "shown" && answer
+          ? `${t(lang, "spokenAnswer")} ${answerText(answer, lang).split("\n").join(" ")}`
+          : phase === "shaking" || phase === "rising"
+            ? t(lang, "hintThinking")
+            : ""}
+      </p>
 
       <SettingsModal
         open={settingsOpen}
