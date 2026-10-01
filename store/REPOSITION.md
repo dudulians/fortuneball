@@ -77,8 +77,14 @@ Pizza or sushi. Stay in or go out. The blue one or the red one. Type them in, sh
 YOUR DECISIONS, CHECKED
 Every decision you write down is saved. A week later the app asks: did it come true? Yes, no, or not yet. The Decisions screen shows how many worked out — 73%, 51%, whatever yours turns out to be.
 
+A BALL OF YOUR OWN
+Fill it with your own answers — the things you would actually want to hear, or the running joke you have with one person. Choose its colour, give it a name. Your answers are written on every face of the die, not just the one that surfaces.
+
 OR JUST ASK YES OR NO
 Switch sides and it is the ball you remember: ask anything, shake, read the answer in the window.
+
+MADE TO BE USED BY ANYONE
+The answer is spoken to VoiceOver, not only drawn. Three type sizes, a high-contrast mode, and the ball stops wobbling when iOS asks for less motion.
 
 MADE, NOT ASSEMBLED
 The liquid is computed in real time, the die turns and settles with its own physics, and the answer lands with a tap you feel in your hand.
@@ -106,8 +112,14 @@ For entertainment only.
 ТВОИ РЕШЕНИЯ, ПРОВЕРЕННЫЕ
 Каждое записанное решение сохраняется. Через неделю приложение спросит: сбылось? Да, нет или пока нет. На экране «Решения» видно, сколько сбылось — 73%, 51%, сколько получится у тебя.
 
+ШАР, КОТОРЫЙ СТАНОВИТСЯ ТВОИМ
+Наполни его своими ответами — теми, которые ты правда хотела бы услышать, или вашей с подругой шуткой. Выбери цвет, дай имя. Твои ответы написаны на всех гранях, а не только на той, что всплывает.
+
 ИЛИ ПРОСТО СПРОСИ: ДА ИЛИ НЕТ
 Переключись — и это тот самый шар: спроси что угодно, встряхни, прочитай ответ в окошке.
+
+СДЕЛАНО ДЛЯ ВСЕХ
+Ответ не только нарисован, но и произносится для VoiceOver. Три размера текста, высокий контраст, и шар перестаёт качаться, если система просит меньше движения.
 
 СДЕЛАНО, А НЕ СОБРАНО
 Жидкость считается в реальном времени, грань поворачивается и оседает по своей физике, а ответ приходит с толчком, который чувствуешь ладонью.
@@ -138,9 +150,10 @@ Entertainment — та самая полка, где Apple видит переи
 
 1. `1-choose` — режим выбора с результатом: «Two options. One shake. Decided.»
 2. `2-decisions` — экран решений с процентом: «Every decision, checked a week later.»
-3. `3-answer` — шар с ответом: «Or just ask yes or no.»
-4. `4-golden` — золотой ответ
-5. `5-collection` — коллекция
+3. `3-myball` — редактор своего шара: «Fill it with your own answers.»
+4. `4-answer` — шар с ответом: «Or just ask yes or no.»
+5. `5-golden` — золотой ответ
+6. `6-collection` — коллекция
 
 Первый скриншот виден в поиске и в выдаче — теперь он про выбор, а не про предсказание.
 
@@ -150,6 +163,11 @@ Entertainment — та самая полка, где Apple видит переи
   (выбор запоминается: кто переключился на «Да / Нет», тот там и останется).
 - Журнал называется **«Решения»**, заголовок статистики — «Твои решения».
 - Карточка для шеринга теперь говорит «Мои решения сбылись в 73% случаев».
+- **Свой шар** (01.10.2026): свои ответы вместо стандартных, свой цвет и имя. Ответы
+  пишутся на всех двадцати гранях; редкие золотые и космические остаются за ними.
+- **Доступность** (01.10.2026): ответ произносится для VoiceOver (до этого он жил только
+  в канвасе и был недоступен), три размера текста, высокий контраст, поддержка системного
+  «меньше движения», видимый фокус для клавиатуры.
 
 ## 9. Что на самом деле написано в правиле 4.3(b)
 
@@ -184,7 +202,11 @@ What makes it different:
 
 2. It checks its own answers. Every decision you write down is saved, and a week later the app asks whether it actually worked out: yes, no, or not yet. The "Decisions" screen shows the share of decisions that came true as a running percentage. A fortune-telling app gives a prediction and forgets it. The point of this one is that it follows up on every answer it gives, and the resulting number belongs to the person, not to the ball.
 
-3. It is built rather than assembled. The liquid inside the window is rendered in real time with WebGL, the die has its own physics and settles differently every time, and answers are delivered through Core Haptics. There is no pre-rendered video and no wrapped web page.
+3. The ball can be made the person's own. They can replace the twenty built-in answers with their own words, name the ball and change its colour; their answers are written on every face of the die, not only the one that surfaces. No other ball in this category lets a person put their own words inside it.
+
+4. It is built to be usable by anyone. The answer is painted into a canvas, so we mirror it into a live region and VoiceOver reads it aloud; there are three type sizes, a high-contrast mode, and the ball stops wobbling when the system asks for reduced motion. We could not find another app in this category that can be used by a blind person at all.
+
+5. It is built rather than assembled. The liquid inside the window is rendered in real time with WebGL, the die has its own physics and settles differently every time, and answers are delivered through Core Haptics. There is no pre-rendered video and no wrapped web page.
 
 The app also contains none of the content described in the decision: no astrology, no horoscopes, no zodiac signs, no palm reading and no tarot.
 

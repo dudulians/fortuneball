@@ -34,16 +34,18 @@ const CAPTIONS = {
   en: [
     { src: "03-choose.png", out: "1-choose.png", text: "Two options.\nOne shake. Decided." },
     { src: "04-journal.png", out: "2-decisions.png", text: "Every decision,\nchecked a week later." },
-    { src: "01-answer.png", out: "3-answer.png", text: "Or just ask\nyes or no." },
-    { src: "02-golden.png", out: "4-golden.png", text: "Rare golden answers\nworth shaking for." },
-    { src: "05-collection.png", out: "5-collection.png", text: "15 rare answers\nto find." },
+    { src: "06-myball.png", out: "3-myball.png", text: "Fill it with\nyour own answers." },
+    { src: "01-answer.png", out: "4-answer.png", text: "Or just ask\nyes or no." },
+    { src: "02-golden.png", out: "5-golden.png", text: "Rare golden answers\nworth shaking for." },
+    { src: "05-collection.png", out: "6-collection.png", text: "15 rare answers\nto find." },
   ],
   ru: [
     { src: "03-choose.png", out: "1-choose.png", text: "Два варианта.\nОдна тряска. Решено." },
     { src: "04-journal.png", out: "2-decisions.png", text: "Каждое решение\nпроверяется через неделю." },
-    { src: "01-answer.png", out: "3-answer.png", text: "Или просто спроси:\nда или нет." },
-    { src: "02-golden.png", out: "4-golden.png", text: "Редкие золотые ответы —\nради них и трясут." },
-    { src: "05-collection.png", out: "5-collection.png", text: "15 редких ответов,\nкоторые надо найти." },
+    { src: "06-myball.png", out: "3-myball.png", text: "Наполни его\nсвоими ответами." },
+    { src: "01-answer.png", out: "4-answer.png", text: "Или просто спроси:\nда или нет." },
+    { src: "02-golden.png", out: "5-golden.png", text: "Редкие золотые ответы —\nради них и трясут." },
+    { src: "05-collection.png", out: "6-collection.png", text: "15 редких ответов,\nкоторые надо найти." },
   ],
 }[LANG];
 

@@ -123,6 +123,18 @@ const stats = {
 // mode is pinned per shot below; the app itself now opens newcomers in "choose"
 const settings = { sound: true, haptics: true, reminders: true, lang: LANG, hasSeenIntro: true, mode: "yesno" };
 
+// A ball someone has already made their own, for the "My ball" shot.
+const CUSTOM = {
+  en: { name: "Katie's ball", answers: ["Say yes", "Not this one", "Ask me tomorrow", "You already know"] },
+  ru: { name: "Шар Кати", answers: ["Скажи да", "Только не это", "Спроси завтра", "Ты и так знаешь"] },
+}[LANG];
+const customBall = {
+  enabled: true,
+  name: CUSTOM.name,
+  hue: "violet",
+  answers: CUSTOM.answers.map((text, i) => ({ id: `c${i}`, text, tone: i === 1 ? "negative" : "positive" })),
+};
+
 const browser = await chromium.launch({
   executablePath: CHROME,
   headless: true,
@@ -189,6 +201,16 @@ await shot("04-journal");
 await page.click(".tabs button:nth-child(2)");
 await page.waitForTimeout(900);
 await shot("05-collection");
+
+// 6 — a ball somebody has made their own
+await page.evaluate((ball) => localStorage.setItem("fortuneball.customBall.v1", ball), JSON.stringify(customBall));
+await page.reload({ waitUntil: "networkidle" });
+await page.waitForTimeout(1200);
+await page.click(".settings-button");
+await page.waitForTimeout(500);
+await page.click(".row-button");
+await page.waitForTimeout(900);
+await shot("06-myball");
 
 console.log(`${OUT}: five screenshots, ${SIZE}`);
 await browser.close();
