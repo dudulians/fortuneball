@@ -29,6 +29,14 @@ interface Props {
   phase: Phase;
   answer: Answer | null;
   lang: Lang;
+  /** A custom ball's colour; the everyday answers take it, rare ones keep theirs. */
+  hue?: string;
+  /**
+   * The answers written on the other nineteen faces. A custom ball shows its
+   * own there too — a ball of your answers with somebody else's on the
+   * neighbouring faces is not your ball.
+   */
+  faces?: string[];
   onSupport?: (ok: boolean) => void;
 }
 
@@ -61,6 +69,15 @@ function textureSizeFor(canvasPx: number): number {
 }
 
 type ToneKey = Tone | Rarity;
+/** A custom ball recolours the everyday answers; golden and cosmic keep theirs. */
+export const HUE_TONES: Record<string, { lit: [number, number, number]; dark: [number, number, number] }> = {
+  blue: { lit: [0.16, 0.36, 0.86], dark: [0.05, 0.13, 0.46] },
+  violet: { lit: [0.52, 0.38, 0.92], dark: [0.19, 0.11, 0.45] },
+  amber: { lit: [0.88, 0.62, 0.22], dark: [0.42, 0.26, 0.05] },
+  green: { lit: [0.18, 0.66, 0.46], dark: [0.04, 0.26, 0.17] },
+  rose: { lit: [0.84, 0.35, 0.53], dark: [0.38, 0.09, 0.2] },
+};
+
 const TONES: Record<ToneKey, { lit: [number, number, number]; dark: [number, number, number] }> = {
   // royal blue like the real thing; the polarity shifts the hue only a touch
   positive: { lit: [0.16, 0.36, 0.86], dark: [0.05, 0.13, 0.46] },
@@ -180,7 +197,7 @@ function answerFaceIndex(answer: Answer | null): number {
   return i < 0 ? 0 : i % 20;
 }
 
-export default function LiquidWindow({ phase, answer, lang, onSupport }: Props) {
+export default function LiquidWindow({ phase, answer, lang, hue, faces, onSupport }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const phaseRef = useRef(phase);
   const phaseAtRef = useRef(performance.now());
@@ -188,6 +205,8 @@ export default function LiquidWindow({ phase, answer, lang, onSupport }: Props) 
   const riseRef = useRef(0);
   const churnRef = useRef(0);
   const toneRef = useRef<ToneKey>(answer?.rarity ?? answer?.tone ?? "positive");
+  const hueRef = useRef(hue);
+  hueRef.current = hue;
   const linesRef = useRef<string[]>([]);
   const customRef = useRef(false);
   const answerFaceRef = useRef(answerFaceIndex(answer));
@@ -309,9 +328,14 @@ export default function LiquidWindow({ phase, answer, lang, onSupport }: Props) 
       gl.generateMipmap(gl.TEXTURE_2D);
     };
 
-    // The 20 ordinary answers decide the one shared font size
-    const allTexts = ANSWERS.map((a) => answerText(a, lang).split("\n"));
-    const faceTexts = allTexts;
+    // The 20 ordinary answers decide the one shared font size — unless the ball
+    // has been filled with somebody's own, in which case theirs do, and theirs
+    // are what the other faces carry too.
+    const builtIn = ANSWERS.map((a) => answerText(a, lang).split("\n"));
+    const own = faces?.length ? faces.map((f) => f.split("\n")) : null;
+    const allTexts = own ?? builtIn;
+    // The die has twenty faces; a shorter set simply repeats around it.
+    const faceTexts = own ? Array.from({ length: ANSWERS.length }, (_, i) => own[i % own.length]) : builtIn;
 
     // Unit 0: the chosen answer, crisp (sized on resize to sample ~1:1 with the screen)
     const texCanvas = document.createElement("canvas");
@@ -453,7 +477,9 @@ export default function LiquidWindow({ phase, answer, lang, onSupport }: Props) 
       if (atlasDirty) uploadAtlas();
       if (textDirtyRef.current) uploadText();
 
-      const tone = TONES[toneRef.current];
+      const key = toneRef.current;
+      const hueTone = hueRef.current ? HUE_TONES[hueRef.current] : undefined;
+      const tone = hueTone && key !== "golden" && key !== "cosmic" ? hueTone : TONES[key];
       gl.uniform1f(U.time, tSec);
       gl.uniform1f(U.rise, rs);
       gl.uniform1f(U.churn, ch);
@@ -525,7 +551,7 @@ export default function LiquidWindow({ phase, answer, lang, onSupport }: Props) 
       gl.deleteBuffer(buf);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang]);
+  }, [lang, faces]);
 
   return <canvas ref={canvasRef} className="liquid-gl" aria-hidden />;
 }

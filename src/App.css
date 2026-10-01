@@ -1412,6 +1412,158 @@ button {
   box-shadow: 0 0 0 2px #0b0b12;
 }
 
+/* ---------- Your own ball ---------- */
+
+.row-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.row-chevron {
+  color: var(--ink-40);
+  font-size: var(--fs-body);
+}
+
+.editor-intro,
+.editor-hint {
+  margin: 6px 0 14px;
+  color: var(--ink-40);
+  font-size: var(--fs-caption);
+  line-height: 1.5;
+}
+
+.editor-section {
+  margin: 22px 0 8px;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+}
+
+.editor-input {
+  flex: 1;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  outline: 0;
+  padding: 9px 12px;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.editor-input:focus {
+  border-color: rgba(111, 128, 255, 0.6);
+}
+
+.editor-input.name {
+  max-width: 180px;
+  text-align: right;
+}
+
+.hues {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.hue {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.hue.active {
+  border-color: var(--ink);
+  transform: scale(1.08);
+}
+
+.answer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.answer-row,
+.answer-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.answer-add {
+  margin-top: 10px;
+}
+
+/* Yes / neither / no — the journal cannot score an answer without knowing this. */
+.tone-pick {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.tone-chip {
+  width: 28px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-40);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tone-chip.active {
+  color: #0b0b12;
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.answer-remove {
+  width: 28px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-40);
+  font-size: var(--fs-body);
+  cursor: pointer;
+}
+
+.answer-add-btn {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 9px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.answer-add-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 /* ---------- Journal (bottom sheet) ---------- */
 
 .sheet-backdrop {

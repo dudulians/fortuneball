@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ANSWERS, CHOICE_ID, findAnswer, makeChoiceAnswer, answerText, type Answer } from "./answers";
 import Ball, { type Phase } from "./Ball";
 import SettingsModal from "./SettingsModal";
@@ -38,6 +38,8 @@ import { accuracy } from "./history";
 import { adDue, showInterstitial, stopAds, warmAds } from "./ads";
 import { refreshPurchases } from "./purchases";
 import { rememberLastAnswer, restoreLastAnswer } from "./lastAnswer";
+import BallEditor from "./BallEditor";
+import { customPool, loadCustomBall, saveCustomBall, type CustomBall } from "./customBall";
 
 const SHAKE_MS = 1300;   // a tap-driven shake: ball rattles, "8" face turns away
 const MIN_SHAKE_MS = 900; // a real shake never ends before this, even if the hand stops early
@@ -67,6 +69,8 @@ export default function App() {
   const [recent, setRecent] = useState<string[][]>(() => loadRecentChoices());
   const [chooseHint, setChooseHint] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [ballEditorOpen, setBallEditorOpen] = useState(false);
+  const [customBall, setCustomBall] = useState<CustomBall>(() => loadCustomBall());
   const [journalOpen, setJournalOpen] = useState(false);
   const [journalTab, setJournalTab] = useState<"answers" | "collection">("answers");
   const [entries, setEntries] = useState<HistoryEntry[]>(() => loadHistory());
@@ -106,6 +110,13 @@ export default function App() {
   optionsRef.current = options;
   const answerRef = useRef(answer);
   answerRef.current = answer;
+  const customBallRef = useRef(customBall);
+  customBallRef.current = customBall;
+  /** The custom answers as the die should carry them, or undefined for the built-in set. */
+  const customFaces = useMemo(
+    () => customPool(customBall, wrapForDie)?.map((x) => x.en),
+    [customBall]
+  );
   const timersRef = useRef<number[]>([]);
   const sceneRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -204,6 +215,7 @@ export default function App() {
     } else {
       const rolled = rollAnswer(answerRef.current?.id, forceSpecialRef.current, {
         skipGolden: goldenDecisionRef.current === "skip",
+        pool: customPool(customBallRef.current, wrapForDie) ?? undefined,
       });
       forceSpecialRef.current = undefined;
       goldenDecisionRef.current = null;
@@ -647,7 +659,7 @@ export default function App() {
             />
           </svg>
         </button>
-        <h1 className="title">{t(lang, "appName")}</h1>
+        <h1 className="title">{customBall.enabled && customBall.name.trim() ? customBall.name.trim() : t(lang, "appName")}</h1>
         <button className="settings-button" onClick={() => setSettingsOpen(true)} aria-label={t(lang, "settings")}>
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden>
             <path
@@ -677,7 +689,7 @@ export default function App() {
         <div className="ball-glow" />
         <div className="ball-shadow" />
         <button className="ball" onClick={onBallTap} aria-label={t(lang, "shakeAria")}>
-          <Ball ref={wobbleRef} phase={phase} answer={answer} lang={lang} bubbleSeed={bubbleSeed} />
+          <Ball ref={wobbleRef} phase={phase} answer={answer} lang={lang} bubbleSeed={bubbleSeed} hue={customBall.enabled ? customBall.hue : undefined} faces={customFaces} />
         </button>
         {answer?.rarity && phase === "shown" && sparkleSeed > 0 && <Sparkles seed={sparkleSeed} kind={answer.rarity} />}
       </div>
@@ -849,6 +861,18 @@ export default function App() {
         onChange={updateSettings}
         onClose={() => setSettingsOpen(false)}
         onAdsRemoved={stopAds}
+        onOpenBall={() => {
+          setSettingsOpen(false);
+          setBallEditorOpen(true);
+        }}
+      />
+
+      <BallEditor
+        open={ballEditorOpen}
+        lang={lang}
+        ball={customBall}
+        onChange={(next) => setCustomBall(saveCustomBall(next))}
+        onClose={() => setBallEditorOpen(false)}
       />
 
       <JournalSheet

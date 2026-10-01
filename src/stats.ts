@@ -104,7 +104,7 @@ function pickSpecial(rarity: "golden" | "cosmic", found: Record<string, number>)
 export function rollAnswer(
   excludeId?: string,
   force?: string,
-  opts: { skipGolden?: boolean } = {}
+  opts: { skipGolden?: boolean; pool?: Answer[] } = {}
 ): { answer: Answer; stats: Stats } {
   const stats = loadStats();
   const goldenDue = isGoldenDue(stats);
@@ -123,7 +123,17 @@ export function rollAnswer(
     }
   }
   if (!answer && Math.random() < COSMIC_ODDS) answer = pickSpecial("cosmic", stats.found);
-  if (!answer) answer = pickRandomAnswer(excludeId);
+  if (!answer) {
+    // A custom ball replaces the twenty ordinary answers; the rare ones still
+    // hide behind them, so the collection survives making the ball your own.
+    const pool = opts.pool?.length ? opts.pool : undefined;
+    if (pool) {
+      const choices = pool.length > 1 ? pool.filter((a) => a.id !== excludeId) : pool;
+      answer = choices[Math.floor(Math.random() * choices.length)];
+    } else {
+      answer = pickRandomAnswer(excludeId);
+    }
+  }
 
   if (answer.rarity && !stats.found[answer.id]) stats.found[answer.id] = Date.now();
   saveStats(stats);

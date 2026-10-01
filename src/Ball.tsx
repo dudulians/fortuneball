@@ -17,6 +17,10 @@ interface Props {
   lang: Lang;
   /** Changes every reveal so the bubbles replay. 0 = never revealed yet. */
   bubbleSeed: number;
+  /** A custom ball's colour. */
+  hue?: string;
+  /** The custom answers, written on the other faces too. */
+  faces?: string[];
 }
 
 function makeBubbles(seed: number) {
@@ -41,7 +45,7 @@ function makeBubbles(seed: number) {
  * die surfaces with the answer.
  */
 const Ball = forwardRef<HTMLDivElement, Props>(function Ball(
-  { phase, answer, lang, bubbleSeed },
+  { phase, answer, lang, bubbleSeed, hue, faces },
   wobbleRef
 ) {
   const text = answer ? answerText(answer, lang) : "";
@@ -95,7 +99,7 @@ const Ball = forwardRef<HTMLDivElement, Props>(function Ball(
 
           {/* Live window, laid over the render's window. Sits under the idle image. */}
           <div className={`window ${gl ? "gl" : ""}`} aria-hidden>
-            <LiquidWindow phase={phase} answer={answer} lang={lang} onSupport={setGl} />
+            <LiquidWindow phase={phase} answer={answer} lang={lang} hue={hue} faces={faces} onSupport={setGl} />
             <div className="caustic" />
 
             <div className="bubbles" key={bubbleSeed}>

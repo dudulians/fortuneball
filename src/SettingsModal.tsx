@@ -10,9 +10,10 @@ interface Props {
   onClose: () => void;
   /** The purchase changed — the app stops preparing ads. */
   onAdsRemoved: () => void;
+  onOpenBall: () => void;
 }
 
-export default function SettingsModal({ open, settings, onChange, onClose, onAdsRemoved }: Props) {
+export default function SettingsModal({ open, settings, onChange, onClose, onAdsRemoved, onOpenBall }: Props) {
   const [price, setPrice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -75,6 +76,11 @@ export default function SettingsModal({ open, settings, onChange, onClose, onAds
         <h2 id="settings-title" className="modal-title">
           {t(lang, "settings")}
         </h2>
+
+        <button type="button" className="row row-button" onClick={onOpenBall}>
+          <span>{t(lang, "myBall")}</span>
+          <span className="row-chevron" aria-hidden>›</span>
+        </button>
 
         <label className="row">
           <span>{t(lang, "sound")}</span>
