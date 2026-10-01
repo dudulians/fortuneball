@@ -74,6 +74,14 @@ export default function JournalSheet({
 
   const acc = accuracy(entries);
   const list = entries.slice().reverse();
+  // Two groups, because the two halves ask different things of the reader:
+  // one wants an answer now, the other is a record to look back at.
+  const waiting = list.filter((e) => isCheckable(e));
+  const settled = list.filter((e) => !isCheckable(e));
+  const GROUPS = [
+    { key: "waiting", label: "groupWaiting" as const, rows: waiting },
+    { key: "settled", label: "groupSettled" as const, rows: settled },
+  ];
   const toNextGolden = shakesToNextGolden(stats);
   const toggleSelected = (id: string) => {
     const next = new Set(selected);
@@ -122,6 +130,81 @@ export default function JournalSheet({
               <p className="empty">{t(lang, "emptyHistory")}</p>
             ) : (
               <>
+                {GROUPS.map(({ key, label, rows }) =>
+                  rows.length === 0 ? null : (
+                <div className="entry-group" key={key}>
+                  <h3 className="entry-group-title">{t(lang, label)}</h3>
+                <ul className="entries">
+                  {rows.map((e) => {
+                    const s = statusOf(e, lang);
+                    const isOpen = isCheckable(e);
+                    const repeats = e.repeats ?? [];
+                    const checked = selected.has(e.id);
+                    return (
+                      <li className={`entry ${e.rarity ?? ""} ${selecting ? "selecting" : ""}`} key={e.id}>
+                        <div className="entry-head">
+                          {selecting && (
+                            <button
+                              className={`check ${checked ? "on" : ""}`}
+                              role="checkbox"
+                              aria-checked={checked}
+                              onClick={() => toggleSelected(e.id)}
+                              aria-label={e.question}
+                            >
+                              {checked && (
+                                <svg viewBox="0 0 24 24" aria-hidden>
+                                  <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" d="M5 12.5l4.5 4.5L19 7.5" />
+                                </svg>
+                              )}
+                            </button>
+                          )}
+                          <div className="entry-q">{e.question}</div>
+                          <span className="entry-date">{dateLabel(e.askedAt, lang)}</span>
+                        </div>
+
+                        <div className="entry-a">
+                          <span className="entry-a-label">{t(lang, "ballSaid")} </span>
+                          {e.answerLabel}
+                          {repeats.length > 0 && (
+                            <span className="repeat-badge" title={t(lang, "askedAgain")}>
+                              ×{repeats.length + 1}
+                            </span>
+                          )}
+                        </div>
+                        {repeats.length > 0 && (
+                          <div className="entry-repeats">
+                            <span className="entry-a-label">{t(lang, "earlierAnswers")} </span>
+                            {repeats
+                              .slice(-3)
+                              .map((r) => r.answerLabel)
+                              .join(" · ")}
+                          </div>
+                        )}
+
+                        {e.kind === "question" &&
+                          (isOpen ? (
+                            <div className="entry-resolve">
+                              <span className="resolve-label">{t(lang, "checkInTitle")}</span>
+                              <div className="entry-resolve-buttons">
+                                <button className="outcome outcome-yes" onClick={() => onResolve(e, "yes")}>
+                                  {t(lang, "outcomeYes")}
+                                </button>
+                                <button className="outcome outcome-no" onClick={() => onResolve(e, "no")}>
+                                  {t(lang, "outcomeNo")}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className={`status ${s.cls}`}>{s.label}</span>
+                          ))}
+                      </li>
+                    );
+                  })}
+                </ul>
+                </div>
+                  )
+                )}
+
                 <div className="list-tools">
                   {selecting ? (
                     <>
@@ -167,90 +250,7 @@ export default function JournalSheet({
                   )}
                 </div>
 
-                <ul className="entries">
-                  {list.map((e) => {
-                    const s = statusOf(e, lang);
-                    const isOpen = isCheckable(e);
-                    const repeats = e.repeats ?? [];
-                    const checked = selected.has(e.id);
-                    return (
-                      <li className={`entry ${e.rarity ?? ""} ${selecting ? "selecting" : ""}`} key={e.id}>
-                        <div className="entry-head">
-                          {selecting && (
-                            <button
-                              className={`check ${checked ? "on" : ""}`}
-                              role="checkbox"
-                              aria-checked={checked}
-                              onClick={() => toggleSelected(e.id)}
-                              aria-label={e.question}
-                            >
-                              {checked && (
-                                <svg viewBox="0 0 24 24" aria-hidden>
-                                  <path fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" d="M5 12.5l4.5 4.5L19 7.5" />
-                                </svg>
-                              )}
-                            </button>
-                          )}
-                          <div className="entry-q">{e.question}</div>
-                          <span className="entry-date">{dateLabel(e.askedAt, lang)}</span>
-                          {!selecting && (
-                            <button className="entry-delete" onClick={() => onDelete(e)} aria-label={t(lang, "deleteEntry")}>
-                              <svg viewBox="0 0 24 24" aria-hidden>
-                                <path
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="1.8"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M5 7h14M10 11v6M14 11v6M6 7l1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12M9 7V4h6v3"
-                                />
-                              </svg>
-                            </button>
-                          )}
-                        </div>
 
-                        <div className="entry-a">
-                          <span className="entry-a-label">{t(lang, "ballSaid")} </span>
-                          {e.answerLabel}
-                          {repeats.length > 0 && (
-                            <span className="repeat-badge" title={t(lang, "askedAgain")}>
-                              ×{repeats.length + 1}
-                            </span>
-                          )}
-                        </div>
-                        {repeats.length > 0 && (
-                          <div className="entry-repeats">
-                            <span className="entry-a-label">{t(lang, "earlierAnswers")} </span>
-                            {repeats
-                              .slice(-3)
-                              .map((r) => r.answerLabel)
-                              .join(" · ")}
-                          </div>
-                        )}
-
-                        {e.kind === "question" &&
-                          (isOpen ? (
-                            <div className="entry-resolve">
-                              <span className="resolve-label">{t(lang, "checkInTitle")}</span>
-                              <div className="entry-resolve-buttons">
-                                <button className="outcome outcome-yes" onClick={() => onResolve(e, "yes")}>
-                                  {t(lang, "outcomeYes")}
-                                </button>
-                                <button className="outcome outcome-no" onClick={() => onResolve(e, "no")}>
-                                  {t(lang, "outcomeNo")}
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="entry-resolve">
-                              <span className="resolve-label">{t(lang, "checkInTitle")}</span>
-                              <span className={`status ${s.cls}`}>{s.label}</span>
-                            </div>
-                          ))}
-                      </li>
-                    );
-                  })}
-                </ul>
               </>
             )}
           </div>

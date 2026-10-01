@@ -647,6 +647,10 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
+        {/* A labelled way in, carrying the number it leads to. The old version
+            was an unlabelled glyph in the corner: people did not find the
+            journal, and the one figure the app is built around stayed hidden
+            behind it. */}
         <button
           className="journal-button"
           onClick={() => {
@@ -657,18 +661,18 @@ export default function App() {
           aria-label={dueCount ? `${t(lang, "journal")}: ${dueCount} ${t(lang, "checksWaiting")}` : t(lang, "journal")}
         >
           {dueCount > 0 && <span className="journal-badge" aria-hidden>{dueCount > 9 ? "9+" : dueCount}</span>}
-          <svg viewBox="0 0 24 24" aria-hidden>
-            <path
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 4.5h11a2 2 0 0 1 2 2v13H7a2 2 0 0 1-2-2v-13zM5 17.5a2 2 0 0 1 2-2h11M9 8.5h5M9 11.5h5"
-            />
-          </svg>
+          <span className="journal-label">{t(lang, "journal")}</span>
+          {accuracy(entries).percent !== null && (
+            <span className="journal-score" aria-hidden>
+              {accuracy(entries).percent}%
+            </span>
+          )}
         </button>
-        <h1 className="title">{customBall.enabled && customBall.name.trim() ? customBall.name.trim() : t(lang, "appName")}</h1>
+        {/* The app's own name says nothing to someone already inside it; a ball
+            that has been given a name does. */}
+        {customBall.enabled && customBall.name.trim() && (
+          <h1 className="title">{customBall.name.trim()}</h1>
+        )}
         <button className="settings-button" onClick={() => setSettingsOpen(true)} aria-label={t(lang, "settings")}>
           <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden>
             <path
